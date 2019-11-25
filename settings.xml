@@ -1,0 +1,102 @@
+<settings>
+    <proxies>
+        <proxy>
+            <id>http-proxy</id>
+            <active>true</active>
+            <protocol>http</protocol>
+            <host>webproxy.h.corp.services</host>
+            <port>80</port>
+        </proxy>
+        <proxy>
+            <id>https-proxy</id>
+            <active>true</active>
+            <protocol>https</protocol>
+            <host>webproxy.h.corp.services</host>
+            <port>80</port>
+        </proxy>
+    </proxies>
+    <servers>
+        <server>
+            <username>s.ejv.relmgmt</username>
+            <password>AP7Q6wuvpAL9VH1jed71pAbkSEc</password>
+            <id>central</id>
+        </server>
+        <server>
+            <username>s.ejv.relmgmt</username>
+            <password>AP7Q6wuvpAL9VH1jed71pAbkSEc</password>
+            <id>CDF</id>
+        </server>
+        <server>
+            <username>s.ejv.relmgmt</username>
+            <password>AP7Q6wuvpAL9VH1jed71pAbkSEc</password>
+            <id>TRLogging</id>
+        </server>
+        <server>
+            <username>s.ejv.relmgmt</username>
+            <password>AP7Q6wuvpAL9VH1jed71pAbkSEc</password>
+            <id>snapshots</id>
+        </server>
+    </servers>
+    <profiles>
+        <profile>
+            <id>default</id>
+            <repositories>
+                <repository>
+                    <id>Central</id>
+                    <url>http://central.maven.org/maven2/</url>
+                </repository>
+                <repository>
+                    <id>central</id>
+                    <url>https://bams-aws.refinitiv.com/artifactory/default.maven.global/ejvqa/</url>
+                </repository>
+                <repository>
+                    <id>cloudera-repo-releases</id>
+                    <url>https://repository.cloudera.com/artifactory/repo/</url>
+                </repository>
+                <repository>
+                    <id>Sonatype Releases</id>
+                    <url>https://oss.sonatype.org/content/repositories/releases/</url>
+                </repository>
+                <repository>
+                    <id>Spring Plugins</id>
+                    <url>http://repo.spring.io/plugins-release/</url>
+                </repository>
+                <repository>
+                    <id>JBoss Releases Repository</id>
+                    <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
+                </repository>
+                <repository>
+                    <id>Spring Libs</id>
+                    <url>http://repo.spring.io/libs-milestone/</url>
+                </repository>
+                <repository>
+                    <id>JBoss Releases</id>
+                    <url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
+                </repository>
+                <repository>
+                    <id>cloudera</id>
+                    <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+                </repository>
+
+
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>central</id>
+                    <name>plugins-release.maven.global</name>
+                    <url>http://bams-aws.refinitiv.com/artifactory/plugins-release.maven.global</url>
+                </pluginRepository>
+                <pluginRepository>
+                    <snapshots/>
+                    <id>snapshots</id>
+                    <name>plugins-snapshot.maven.global</name>
+                    <url>http://bams-aws.refinitiv.com/artifactory/plugins-snapshot.maven.global</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+    <activeProfiles>
+        <activeProfile>default</activeProfile>
+    </activeProfiles>
+
+</settings>
