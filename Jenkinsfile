@@ -4,7 +4,8 @@ pipeline{
 	stages{
 		stage('Build'){
 			steps{
-				checkout scm
+				//checkout scm
+				echo "Build URL is ${env.BUILD_URL}"
 				bat 'mvn -verison'
 				bat 'mvn -B --settings settings.xml compile -DskipTests'
 			}
