@@ -90,7 +90,7 @@ public class ViewFileGenerationService {
                 CommonUtil.generateViewNames(databaseMetaData, schemaPattern);
                 CommonUtil.deleteView(statement, viewName);
                 CommonUtil.createViewFromDatabase(statement, viewName, createViewSql);
-                if(fileDestPath==null){
+                if(fileDestPath.equalsIgnoreCase("local")){
                     fileDestPath=System.getProperty("user.dir")+"/output/";
                 }
                 CommonUtil.extractDataFromView(DBTag, statement, selectViewSql, viewName, fileDestPath);
