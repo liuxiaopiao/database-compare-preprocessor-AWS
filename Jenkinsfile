@@ -8,7 +8,7 @@ pipeline{
 				echo "Build URL is ${env.BUILD_URL}"
 				bat 'mvn -verison'
 				bat 'mvn clean'
-				//bat 'mvn -B --settings settings.xml compile -DskipTests'
+				bat 'mvn -B --settings settings.xml compile -DskipTests'
 			}
 		}
 		
