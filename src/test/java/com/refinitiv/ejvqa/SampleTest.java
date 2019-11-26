@@ -1,12 +1,10 @@
 package com.refinitiv.ejvqa;
 
+import com.refinitiv.ejvqa.util.CommonUtil;
 import org.testng.annotations.Test;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
+import java.io.*;
 import java.util.regex.Pattern;
 
 public class SampleTest {
@@ -59,5 +57,24 @@ public class SampleTest {
                 file2.delete();
             }
         }
+    }
+
+    @Test
+    public void zipfiletest() throws IOException {
+        String destDir=System.getProperty("user.dir")+"/output/";
+        String srcDir="C:\\work\\1\\comparedata";
+//        FileOutputStream fos=new FileOutputStream(new File(destDir+"compare.zip"));
+        FileOutputStream fos=new FileOutputStream(new File(new File(srcDir)+"/data.zip"));
+//        FileOutputStream fos=new FileOutputStream(new File(destDir.replace("output/","data.zip")));
+        CommonUtil.zipAllFile(srcDir,fos,true);
+        fos.close();
+    }
+
+    @Test
+    public void uploadS3ObjectTest(){
+        String bucketName="fileoutput-20191126-bucket";
+        String outputPath="2/compare.zip";
+        String filepath=System.getProperty("user.dir")+"/output/compare.zip";
+        CommonUtil.uploadToS3(bucketName,new File(filepath).getName(),filepath);
     }
 }

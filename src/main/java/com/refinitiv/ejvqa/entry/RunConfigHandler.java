@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
 import com.refinitiv.ejvqa.service.ViewFileGenerationService;
+import com.refinitiv.ejvqa.util.CommonUtil;
 import org.eclipse.jgit.api.CommitCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.internal.storage.file.FileRepository;
@@ -52,8 +53,8 @@ public class RunConfigHandler implements RequestHandler<JSONObject,String> {
             }
         }else {
             try {
-                Git.cloneRepository().setURI("https://github.com/wjxpeking2019/simple-java-maven-app.git").setDirectory(new File("/tmp")).call();
-                File modifyFile = new File("/tmp/config.properties");
+                Git.cloneRepository().setURI("https://github.com/wjxpeking2019/simple-java-maven-app.git").setDirectory(new File("/tmp/git")).call();
+                File modifyFile = new File("/tmp/git/src/main/resources/config.properties");
                 FileOutputStream fileOutputStream = new FileOutputStream(modifyFile);
                 Properties properties = new Properties();
 
@@ -71,14 +72,17 @@ public class RunConfigHandler implements RequestHandler<JSONObject,String> {
                 fileOutputStream.flush();
                 fileOutputStream.close();
 
-                Git git = Git.open(new File("/tmp/.git"));
+                Git git = Git.open(new File("/tmp/git/.git"));
                 git.add().addFilepattern(".").call();
                 CommitCommand commitCommand = git.commit().setMessage("update config for a new run.").setAllowEmpty(true);
                 commitCommand.call();
-                Repository repository = new FileRepository("/tmp/.git");
+                Repository repository = new FileRepository("/tmp/git/.git");
                 git = new Git(repository);
                 git.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider("wjxpeking2019", "5aiyun22019")).call();
+                File file=new File("/tmp/git");
+                CommonUtil.deleteAllFile(file);
                 System.out.println("Successfully!");
+
                 return "Successfully!";
             } catch (Exception e) {
                 e.printStackTrace();

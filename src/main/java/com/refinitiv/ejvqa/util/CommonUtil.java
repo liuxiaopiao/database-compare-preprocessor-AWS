@@ -1,5 +1,9 @@
 package com.refinitiv.ejvqa.util;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectResult;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -10,6 +14,8 @@ import java.sql.*;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.zip.GZIPOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 /**
  * Common util for create View
@@ -222,7 +228,7 @@ public class CommonUtil {
         }
     }
 
-    public static void deleteFile(String fileDestPath){
+    public static void deleteOnlyFile(String fileDestPath){
         File file=new File(fileDestPath);
         File[] files=file.listFiles();
         for(File subFile:files){
@@ -232,4 +238,100 @@ public class CommonUtil {
         }
     }
 
+    public static void deleteAllFile(File deletefile) {
+        if (!deletefile.exists()) {
+            return;
+        }
+        if (deletefile.isFile()) {
+            deletefile.delete();
+            return;
+        }
+        File[] files = deletefile.listFiles();
+        for (File subFile : files) {
+            deleteAllFile(subFile);
+        }
+        deletefile.delete();
+    }
+
+    public static void zipAllFile(String srcPath, OutputStream outputStream, boolean KeepDirStructure){
+        long start = System.currentTimeMillis();
+        ZipOutputStream zos = null;
+        try {
+            zos = new ZipOutputStream(outputStream);
+            File sourceFile = new File(srcPath);
+            compress(sourceFile, zos, sourceFile.getName(), KeepDirStructure);
+            long end = System.currentTimeMillis();
+            System.out.println("Compress Complete,Timeuse:" + (end - start) + " ms");
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("System Error:"+e);
+        } finally {
+            if (zos != null) {
+                try {
+                    zos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    System.err.println("System Error:"+e);
+                }
+            }
+        }
+    }
+
+    private static void compress(File sourceFile, ZipOutputStream zos, String name,
+                                 boolean KeepDirStructure) {
+        byte[] buf = new byte[2048];
+        try {
+            if (sourceFile.isFile()) {
+                zos.putNextEntry(new ZipEntry(name));
+                int len;
+                FileInputStream in = new FileInputStream(sourceFile);
+                while ((len = in.read(buf)) != -1) {
+                    zos.write(buf, 0, len);
+                }
+                zos.closeEntry();
+                in.close();
+            } else {
+                File[] listFiles = sourceFile.listFiles();
+                if (listFiles == null || listFiles.length == 0) {
+                    if (KeepDirStructure) {
+                        zos.putNextEntry(new ZipEntry(name + "/"));
+                        zos.closeEntry();
+                    }
+                } else {
+                    for (File file : listFiles) {
+                        if (KeepDirStructure) {
+                            compress(file, zos, name + "/" + file.getName(), KeepDirStructure);
+                        } else {
+                            compress(file, zos, file.getName(), KeepDirStructure);
+                        }
+                    }
+                }
+            }
+            zos.flush();
+        }catch(Exception e){
+            e.printStackTrace();
+            System.err.println("System Error:"+e);
+        }
+    }
+
+    public static void uploadToS3(String bucketName,String outputPath,String filePath){
+        try {
+            FileInputStream fileInputStream = new FileInputStream(new File(filePath));
+            ObjectMetadata objectMetadata = new ObjectMetadata();
+            if (filePath.contains(".gz")) {
+                objectMetadata.setContentType("application/x-gzip");
+            } else if (filePath.contains(".zip")) {
+                objectMetadata.setContentType("application/zip");
+            }
+            AmazonS3 s3Client = AmazonS3ClientBuilder.defaultClient();
+            PutObjectResult putObjectResult = s3Client.putObject(bucketName, outputPath, fileInputStream, objectMetadata);
+            if (putObjectResult.getETag() != null) {
+                System.out.println("Upload Successfully!");
+            } else {
+                System.out.println("Upload Failed!");
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 }

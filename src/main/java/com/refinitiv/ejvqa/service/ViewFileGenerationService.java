@@ -5,6 +5,10 @@ import com.refinitiv.ejvqa.util.MssqlConvertUtil;
 import com.refinitiv.ejvqa.util.OracleConvertUtil;
 import com.refinitiv.ejvqa.util.SybaseConvertUtil;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
@@ -24,6 +28,7 @@ public class ViewFileGenerationService {
         String convertField = null;
         String createViewSql = "";
         String selectViewSql = "";
+        FileOutputStream fileOutputStream=null;
         try {
             connection = CommonUtil.createConnection(DBTag, connection, ip_port, databaseName1, username, password);
             databaseMetaData = CommonUtil.generateDatabaseMetaData(connection);
@@ -97,19 +102,27 @@ public class ViewFileGenerationService {
                     fileDestPath = System.getProperty("user.dir") + "/output/";
                 }
                 CommonUtil.extractDataFromView(DBTag, statement, selectViewSql, viewName, fileDestPath);
-                CommonUtil.deleteFile(fileDestPath);
+                CommonUtil.deleteOnlyFile(fileDestPath);
                 System.out.println();
             }
-            if(statement!=null||connection!=null) {
+            if(fileDestPath.equalsIgnoreCase("local")){
+                fileDestPath=System.getProperty("user.dir") + "/output/";
+                fileOutputStream=new FileOutputStream(new File(fileDestPath.replace("output/","ProcessedData.zip")));
+            }else{
+                fileOutputStream=new FileOutputStream(new File(new File(fileDestPath).getParent()+"/ProcessedData.zip"));
+            }
+            CommonUtil.zipAllFile(fileDestPath,fileOutputStream,true);
+
+            String filePath=new File(fileDestPath).getParent()+"/ProcessedData.zip";
+            CommonUtil.uploadToS3("fileoutput-20191126-bucket",new File(filePath).getName(),filePath);
+            if(statement!=null||connection!=null||fileOutputStream!=null) {
                 statement.close();
                 connection.close();
+                fileOutputStream.close();
             }
-        } catch (SQLException e) {
+        } catch (Exception e){
             e.printStackTrace();
-            flag = false;
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            flag = false;
+            flag=false;
         }
         return flag;
     }
