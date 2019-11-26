@@ -14,7 +14,7 @@ pipeline{
 		
 		stage('Generate View&Extract Data to file') {
 			steps{
-				bat 'mvn exec:exec -Dexec.mainClass=com.refinitiv.ejvqa.entry.ViewFileGenerationServiceEntry'
+				bat 'mvn exec:java -Dexec.mainClass=com.refinitiv.ejvqa.entry.ViewFileGenerationServiceEntry -Dexec.cleanupDaemonThreads=false'
 			}
         }
 	}
