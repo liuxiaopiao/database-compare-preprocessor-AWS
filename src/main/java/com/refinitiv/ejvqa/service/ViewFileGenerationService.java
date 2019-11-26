@@ -43,6 +43,9 @@ public class ViewFileGenerationService {
             }
 
             for (String tableName : tableNameSet) {
+                connection = CommonUtil.createConnection(DBTag, connection, ip_port, databaseName1, username, password);
+                databaseMetaData = CommonUtil.generateDatabaseMetaData(connection);
+                statement = connection.createStatement();
                 String viewName = tableName + "_ViewJ";
                 LinkedHashSet<String> indexColumnNameSet = CommonUtil.generateIndexColumnNames(databaseMetaData, tableName);
                 LinkedHashMap<String, String> columnMap = CommonUtil.generateColumnInfo(databaseMetaData, tableName);
@@ -95,13 +98,12 @@ public class ViewFileGenerationService {
                 }
                 CommonUtil.extractDataFromView(DBTag, statement, selectViewSql, viewName, fileDestPath);
                 CommonUtil.deleteFile(fileDestPath);
-                connection = CommonUtil.createConnection(DBTag, connection, ip_port, databaseName1, username, password);
-                databaseMetaData = CommonUtil.generateDatabaseMetaData(connection);
-                statement = connection.createStatement();
                 System.out.println();
             }
-            statement.close();
-            connection.close();
+            if(statement!=null||connection!=null) {
+                statement.close();
+                connection.close();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             flag = false;
