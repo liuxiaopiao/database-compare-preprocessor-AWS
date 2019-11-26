@@ -14,8 +14,8 @@ import java.util.LinkedHashSet;
 
 public class ViewFileGenerationService {
 
-    public boolean generateView(String DBTag, String ip_port, String databaseName1, String databaseName2,String username, String password, String tableNamePath, String schemaPattern, String extractNum, String fileDestPath) {
-        boolean flag=true;
+    public boolean generateView(String DBTag, String ip_port, String databaseName1, String databaseName2, String username, String password, String tableNamePath, String schemaPattern, String extractNum, String fileDestPath) {
+        boolean flag = true;
         Connection connection = null;
         DatabaseMetaData databaseMetaData = null;
         Statement statement = null;
@@ -32,10 +32,10 @@ public class ViewFileGenerationService {
 
             if ("All".equalsIgnoreCase(tableNamePath)) {
                 tableNameSet = CommonUtil.generateTableNames(databaseMetaData, schemaPattern);
-            } else if(tableNamePath==null){
-                tableNamePath=System.getProperty("user.dir")+"/src/data/TableName.xlsx";
+            } else if (tableNamePath == null) {
+                tableNamePath = System.getProperty("user.dir") + "/src/data/TableName.xlsx";
                 tableNameSet = CommonUtil.generateTableNameFromExcel(tableNamePath);
-            }else if (tableNamePath.endsWith(".xlsx")) {
+            } else if (tableNamePath.endsWith(".xlsx")) {
                 tableNameSet = CommonUtil.generateTableNameFromExcel(tableNamePath);
             } else {
                 tableNameSet = new LinkedHashSet<String>();
@@ -82,16 +82,16 @@ public class ViewFileGenerationService {
                 } else {
                     System.out.println("The database is not currently supported!");
                 }
-                if(databaseName1!=null&&databaseName2!=null){
-                    connection=CommonUtil.createConnection(DBTag, connection, ip_port, databaseName2, username, password);
+                if (databaseName1 != null && databaseName2 != null) {
+                    connection = CommonUtil.createConnection(DBTag, connection, ip_port, databaseName2, username, password);
                     databaseMetaData = CommonUtil.generateDatabaseMetaData(connection);
                     statement = connection.createStatement();
                 }
                 CommonUtil.generateViewNames(databaseMetaData, schemaPattern);
                 CommonUtil.deleteView(statement, viewName);
                 CommonUtil.createViewFromDatabase(statement, viewName, createViewSql);
-                if(fileDestPath.equalsIgnoreCase("local")){
-                    fileDestPath=System.getProperty("user.dir")+"/output/";
+                if (fileDestPath.equalsIgnoreCase("local")) {
+                    fileDestPath = System.getProperty("user.dir") + "/output/";
                 }
                 CommonUtil.extractDataFromView(DBTag, statement, selectViewSql, viewName, fileDestPath);
                 CommonUtil.deleteFile(fileDestPath);
@@ -104,10 +104,10 @@ public class ViewFileGenerationService {
             connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
-            flag=false;
+            flag = false;
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
-            flag=false;
+            flag = false;
         }
         return flag;
     }

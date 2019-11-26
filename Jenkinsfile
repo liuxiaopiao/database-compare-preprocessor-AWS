@@ -7,7 +7,7 @@ pipeline{
 				//checkout scm
 				echo "Build URL is ${env.BUILD_URL}"
 				bat 'mvn -verison'
-				bat 'mvn -B --settings settings.xml compile -DskipTests'
+				//bat 'mvn -B --settings settings.xml compile -DskipTests'
 			}
 		}
 		
