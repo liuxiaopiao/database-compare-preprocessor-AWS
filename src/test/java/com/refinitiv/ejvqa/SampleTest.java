@@ -5,6 +5,8 @@ import org.testng.annotations.Test;
 
 import javax.swing.*;
 import java.io.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.regex.Pattern;
 
 public class SampleTest {
@@ -77,4 +79,15 @@ public class SampleTest {
         String filepath=System.getProperty("user.dir")+"/output/compare.zip";
         CommonUtil.uploadToS3(bucketName,new File(filepath).getName(),filepath);
     }
+
+    @Test
+    public void ConnectTest() throws SQLException, ClassNotFoundException {
+
+        Connection connection=null;
+        String ip_port="10.218.77.150:1433";
+        String username="readonly";
+        String pwd="Welcome1";
+        connection=CommonUtil.createConnection("mssql",connection,ip_port,"qai_master",username,pwd);
+    }
+
 }
