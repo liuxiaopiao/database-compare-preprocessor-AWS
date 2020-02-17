@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="ViewFileGererationServiceTestSuite">
+
+    <test name="Oracle extraction file generation Test with singel tableName">
+        <parameter name="DBTag" value="oracle"/>
+        <parameter name="ip_port" value="fnr-scan-ut0234.int.thomsonreuters.com:1521:oru848a1"/>
+        <parameter name="databaseName1" value="BIMBQM"/>
+        <parameter name="username" value="read_only"/>
+        <parameter name="password" value="read_only"/>
+        <parameter name="tableNamePath" value="All"/>
+        <parameter name="schemaPattern" value="BIMBQM"/>
+        <parameter name="extractNum" value="1000"/>
+        <parameter name="fileDestPath" value="local"/>
+        <classes>
+            <class name="com.refinitiv.ejvqa.ExtractDataFromDBTest"/>
+        </classes>
+    </test>
+</suite>
+

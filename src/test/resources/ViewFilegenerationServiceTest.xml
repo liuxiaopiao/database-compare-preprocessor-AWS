@@ -2,37 +2,37 @@
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 
 <suite name="ViewFileGererationServiceTestSuite">
-    <test name="Sybase viewfile generation Test with xlsx">
-        <parameter name="DBTag" value="sybase"></parameter>
-        <parameter name="ip_port" value="10.53.9.195:4074"></parameter>
-        <parameter name="databaseName1" value="data_creditds"></parameter>
-        <parameter name="databaseName2" value="scratch"></parameter>
-        <parameter name="username" value="dsos_dist"></parameter>
-        <parameter name="password" value="EJV4fiswr"></parameter>
-        <parameter name="tableNamePath" value="cds_index"></parameter>
-        <parameter name="schemaPattern" value="%"></parameter>
-        <parameter name="extractNum" value="1000"></parameter>
-        <parameter name="fileDestPath" value="local"></parameter>
-        <classes>
-            <class name="com.refinitiv.ejvqa.ViewFileGenerationServiceTest"></class>
-        </classes>
-    </test>
-
-<!--    <test name="Sybase viewfile generation Test">-->
-<!--        <parameter name="DBTag" value="sybase"></parameter>-->
-<!--        <parameter name="ip_port" value="10.53.9.195:4074"></parameter>-->
-<!--        <parameter name="databaseName1" value="scratch"></parameter>-->
-<!--        <parameter name="databaseName2" value="data_creditds"></parameter>-->
-<!--        <parameter name="username" value="dsos_dist"></parameter>-->
-<!--        <parameter name="password" value="EJV4fiswr"></parameter>-->
-<!--        <parameter name="tableNamePath" value="null"></parameter>-->
-<!--        <parameter name="schemaPattern" value="dbo"></parameter>-->
-<!--        <parameter name="extractNum" value="1000"></parameter>-->
-<!--        <parameter name="fileDestPath" value="E:\OutPut"></parameter>-->
+<!--    <test name="Sybase viewfile generation Test with xlsx">-->
+<!--        <parameter name="DBTag" value="sybase"/>-->
+<!--        <parameter name="ip_port" value="10.53.9.195:4074"/>-->
+<!--        <parameter name="databaseName1" value="data_creditds"/>-->
+<!--        <parameter name="databaseName2" value="scratch"/>-->
+<!--        <parameter name="username" value="dsos_dist"/>-->
+<!--        <parameter name="password" value="EJV4fiswr"/>-->
+<!--        <parameter name="tableNamePath" value="cds_index"/>-->
+<!--        <parameter name="schemaPattern" value="%"/>-->
+<!--        <parameter name="extractNum" value="1000"/>-->
+<!--        <parameter name="fileDestPath" value="local"/>-->
 <!--        <classes>-->
-<!--            <class name="com.refinitiv.ejvqa.ViewFileGenerationServiceTest"></class>-->
+<!--            <class name="com.refinitiv.ejvqa.ViewFileGenerationServiceTest"/>-->
 <!--        </classes>-->
 <!--    </test>-->
+
+<!--        <test name="Sybase viewfile generation Test">-->
+<!--            <parameter name="DBTag" value="sybase"></parameter>-->
+<!--            <parameter name="ip_port" value="10.53.9.195:4074"></parameter>-->
+<!--            <parameter name="databaseName1" value="scratch"></parameter>-->
+<!--            <parameter name="databaseName2" value="data_creditds"></parameter>-->
+<!--            <parameter name="username" value="dsos_dist"></parameter>-->
+<!--            <parameter name="password" value="EJV4fiswr"></parameter>-->
+<!--            <parameter name="tableNamePath" value="null"></parameter>-->
+<!--            <parameter name="schemaPattern" value="dbo"></parameter>-->
+<!--            <parameter name="extractNum" value="1000"></parameter>-->
+<!--            <parameter name="fileDestPath" value="E:\OutPut"></parameter>-->
+<!--            <classes>-->
+<!--                <class name="com.refinitiv.ejvqa.ViewFileGenerationServiceTest"></class>-->
+<!--            </classes>-->
+<!--        </test>-->
 
 <!--    <test name="Mssql viewfile generation Test with xlsx">-->
 <!--        <parameter name="DBTag" value="mssql"></parameter>-->
@@ -66,20 +66,52 @@
 <!--        </classes>-->
 <!--    </test>-->
 
-<!--        <test name="Oracle viewfile generation Test with xlsx">-->
-<!--            <parameter name="DBTag" value="oracle"></parameter>-->
-<!--            <parameter name="ip_port" value="10.218.77.190:1521"></parameter>-->
-<!--            <parameter name="databaseName1" value="data_govcorp"></parameter>-->
-<!--            <parameter name="databaseName2" value="null"></parameter>-->
-<!--            <parameter name="username" value="TRQA"></parameter>-->
-<!--            <parameter name="password" value="TQA123P"></parameter>-->
-<!--            <parameter name="tableNamePath" value="AXFACTCOVAR_V4"></parameter>-->
-<!--            <parameter name="schemaPattern" value="TRQA"></parameter>-->
-<!--            <parameter name="extractNum" value="1000"></parameter>-->
-<!--            <parameter name="fileDestPath" value="null"></parameter>-->
-<!--            <classes>-->
-<!--                <class name="com.refinitiv.ejvqa.ViewFileGenerationServiceTest"></class>-->
-<!--            </classes>-->
-<!--        </test>-->
+<!--    <test name="Oracle viewfile generation Test with xlsx">-->
+<!--        <parameter name="DBTag" value="oracle"></parameter>-->
+<!--        <parameter name="ip_port" value="10.218.77.190:1521"></parameter>-->
+<!--        <parameter name="databaseName1" value="data_govcorp"></parameter>-->
+<!--        <parameter name="databaseName2" value="null"></parameter>-->
+<!--        <parameter name="username" value="TRQA"></parameter>-->
+<!--        <parameter name="password" value="TQA123P"></parameter>-->
+<!--        <parameter name="tableNamePath" value="AXFACTCOVAR_V4"></parameter>-->
+<!--        <parameter name="schemaPattern" value="TRQA"></parameter>-->
+<!--        <parameter name="extractNum" value="1000"></parameter>-->
+<!--        <parameter name="fileDestPath" value="null"></parameter>-->
+<!--        <classes>-->
+<!--            <class name="com.refinitiv.ejvqa.ViewFileGenerationServiceTest"></class>-->
+<!--        </classes>-->
+<!--    </test>-->
+
+<!--    <test name="Oracle viewfile generation Test with xlsx">-->
+<!--        <parameter name="DBTag" value="oracle"/>-->
+<!--        <parameter name="ip_port" value="fnr-scan-ut0234.int.thomsonreuters.com:1521:oru848a1"/>-->
+<!--        <parameter name="databaseName1" value="BIMBQM"/>-->
+<!--        <parameter name="databaseName2" value="null"/>-->
+<!--        <parameter name="username" value="read_only"/>-->
+<!--        <parameter name="password" value="read_only"/>-->
+<!--        <parameter name="tableNamePath" value="IDENTIFIER"/>-->
+<!--        <parameter name="schemaPattern" value="BIMBQM"/>-->
+<!--        <parameter name="extractNum" value="1000"/>-->
+<!--        <parameter name="fileDestPath" value="null"/>-->
+<!--        <classes>-->
+<!--            <class name="com.refinitiv.ejvqa.ViewFileGenerationServiceTest"/>-->
+<!--        </classes>-->
+<!--    </test>-->
+
+    <test name="Oracle viewfile generation Test with xlsx">
+        <parameter name="DBTag" value="oracle"/>
+        <parameter name="ip_port" value="fnr-scan-ut0234.int.thomsonreuters.com:1521:oru848a1"/>
+        <parameter name="databaseName1" value="BIMBQM"/>
+        <parameter name="databaseName2" value="null"/>
+        <parameter name="username" value="read_only"/>
+        <parameter name="password" value="read_only"/>
+        <parameter name="tableNamePath" value="BIMBQM.IDENTIFIER"/>
+        <parameter name="schemaPattern" value="BIMBQM"/>
+        <parameter name="extractNum" value="1000"/>
+        <parameter name="fileDestPath" value="local"/>
+        <classes>
+            <class name="com.refinitiv.ejvqa.ViewFileGenerationServiceTest"/>
+        </classes>
+    </test>
 </suite>
 

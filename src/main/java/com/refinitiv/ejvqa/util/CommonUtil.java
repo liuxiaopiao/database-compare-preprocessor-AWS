@@ -11,8 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.sql.*;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
+import java.util.*;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -25,6 +24,7 @@ public class CommonUtil {
     public static LinkedHashSet<String> tablNameSet;
     public static LinkedHashSet<String> viewNameSet;
     public static LinkedHashSet<String> indexColumNameSet;
+    public static LinkedList<String> primaryKeyList;
     public static LinkedHashMap<String, String> columnMap;
     public static final String DatabaseName1 = "scratch";
     public static final String DatabaseName2 = "data_creditds";
@@ -42,7 +42,7 @@ public class CommonUtil {
             url = "jdbc:sqlserver://" + ip_port + ";databaseName=" + databaseName;
         } else if ("oracle".equalsIgnoreCase(DBTag)) {
             Class.forName("oracle.jdbc.OracleDriver");
-            url = "jdbc:oracle:thin:@" + ip_port + ":orcl";
+            url = "jdbc:oracle:thin:@" + ip_port;
         } else {
             System.out.println("The database is not currently supported!");
         }
@@ -70,7 +70,9 @@ public class CommonUtil {
         tablNameSet = new LinkedHashSet<String>();
         ResultSet tableSet = databaseMetaData.getTables(null, schemaPattern, "%", new String[]{"TABLE"});
         while (tableSet.next()) {
-            tablNameSet.add(tableSet.getString("TABLE_NAME"));
+            if(!tableSet.getString("TABLE_NAME").contains("_BKP")) {
+                tablNameSet.add(tableSet.getString("TABLE_NAME"));
+            }
         }
         System.out.println(tablNameSet);
         return tablNameSet;
@@ -133,9 +135,19 @@ public class CommonUtil {
         return indexColumNameSet;
     }
 
+    public static LinkedList<String> generatePrimaryKeys(DatabaseMetaData databaseMetaData,String schemaPattern,String tableName) throws SQLException {
+        primaryKeyList=new LinkedList<>();
+        ResultSet resultSet=databaseMetaData.getPrimaryKeys(null,schemaPattern,tableName);
+        while(resultSet.next()){
+            primaryKeyList.add(resultSet.getString("COLUMN_NAME"));
+        }
+        Collections.reverse(primaryKeyList);
+        return  primaryKeyList;
+    }
+
     public static LinkedHashMap<String, String> generateColumnInfo(DatabaseMetaData databaseMetaData, String tableName) throws SQLException {
         columnMap = new LinkedHashMap<String, String>();
-        ResultSet columnSet = databaseMetaData.getColumns(null, null, tableName, "%");
+        ResultSet columnSet = databaseMetaData.getColumns(null, null,tableName, "%");
         while (columnSet.next()) {
             columnMap.put(columnSet.getString("COLUMN_NAME"), columnSet.getString("TYPE_NAME"));
         }
@@ -165,7 +177,7 @@ public class CommonUtil {
     }
 
     public static void extractDataFromView(String databaseName, Statement statement, String sql, String viewName, String parentPath) throws SQLException {
-        if (viewNameSet.contains(viewName)) {
+        if ("oracle".equalsIgnoreCase(databaseName) || viewNameSet.contains(viewName)) {
             System.out.println("Start extracting Data to file...");
             long starttime = System.currentTimeMillis();
             System.out.println(sql);
@@ -183,6 +195,7 @@ public class CommonUtil {
             } else if ("mysql".equalsIgnoreCase(databaseName)) {
                 fileName = "my_" + viewName.replaceAll("_V.{3}J", "");
             }
+            System.out.println(parentPath + fileName);
             File file = new File(parentPath + fileName);
             try {
                 if (!file.exists()) {
@@ -201,7 +214,7 @@ public class CommonUtil {
                     sb.append("\r\n");
                     fileWriter.write(sb.toString());
                     fileWriter.flush();
-                    sb=new StringBuilder();
+                    sb = new StringBuilder();
                 }
                 fileWriter.close();
                 long endtime = System.currentTimeMillis();
@@ -228,11 +241,103 @@ public class CommonUtil {
         }
     }
 
-    public static void deleteOnlyFile(String fileDestPath){
-        File file=new File(fileDestPath);
-        File[] files=file.listFiles();
-        for(File subFile:files){
-            if(subFile.isFile()){
+    public static void extractDataBySQL(Statement statement,String sql,String path) throws SQLException, IOException {
+        ResultSet resultSet=statement.executeQuery(sql);
+        resultSet.last();
+        int lastIndex=resultSet.getRow();
+        System.out.println("The Extract number of records is: "+lastIndex);
+        resultSet.beforeFirst();
+        ResultSetMetaData resultSetMetaData=resultSet.getMetaData();
+
+        long begin=System.currentTimeMillis();
+        long loopBegin=begin;
+        long timeuse=0;
+        System.out.println("Starting extract data......");
+
+        StringBuilder rowData=new StringBuilder();
+        List<String> pageData=new LinkedList<>();
+
+        int j=0;
+        int columnCount=resultSetMetaData.getColumnCount();
+
+        if(primaryKeyList.size()!=0){
+            rowData.append("PrimaryKey|");
+        }
+        for(int i=1;i<=columnCount;i++){
+            rowData.append(resultSetMetaData.getColumnLabel(i)+"|");
+        }
+        rowData.append("\r\n");
+
+        while(resultSet.next()){
+            j++;
+            if(primaryKeyList.size()!=0){
+                for(String primaryKey:primaryKeyList){
+                    rowData.append(resultSet.getString(primaryKey));
+                }
+                rowData.append("|");
+            }
+            for(int i=1;i<=columnCount;i++){
+                rowData.append(resultSet.getString(i)+"|");
+            }
+            rowData.append("\r\n");
+
+            pageData.add(rowData.toString());
+            rowData.setLength(0);
+
+            if(j%1000==0){
+                writeFile(pageData,path);
+                pageData.clear();
+                timeuse=System.currentTimeMillis();
+                System.out.println("Output "+j+" rows,Timeuse: "+(timeuse-loopBegin)+"ms");
+                loopBegin=timeuse;
+            }
+        }
+
+        if(j%1000!=0){
+            writeFile(pageData,path);
+        }
+
+        long end=System.currentTimeMillis();
+        System.out.println("Total timeuse is: "+(end-begin)+"ms");
+    }
+
+    public static void writeFile(List<String> data,String path) throws IOException {
+        if(null==data||data.size()==0){
+            return;
+        }
+
+        File file=new File(path);
+
+        if(file.exists()){
+            file.delete();
+            System.out.println("Delete Old File!");
+        }
+
+        if(!file.exists()){
+            new File(file.getParent()).mkdirs();
+            file.createNewFile();
+            System.out.println("Create New File!");
+        }
+
+        FileOutputStream fileOutputStream=new FileOutputStream(path,true);
+        OutputStreamWriter outputStreamWriter=new OutputStreamWriter(fileOutputStream,"UTF-8");
+        BufferedWriter bufferedWriter=new BufferedWriter(outputStreamWriter);
+
+        for(String row:data){
+            bufferedWriter.write(row);
+            bufferedWriter.flush();
+        }
+
+        bufferedWriter.close();
+        outputStreamWriter.close();
+        fileOutputStream.close();
+    }
+
+    public static void deleteOnlyFile(String fileDestPath) {
+        File file = new File(fileDestPath);
+        File[] files = file.listFiles();
+        for (File subFile : files) {
+            if (subFile.isFile()) {
                 subFile.delete();
             }
         }
@@ -253,7 +358,7 @@ public class CommonUtil {
         deletefile.delete();
     }
 
-    public static void zipAllFile(String srcPath, OutputStream outputStream, boolean KeepDirStructure){
+    public static void zipAllFile(String srcPath, OutputStream outputStream, boolean KeepDirStructure) {
         long start = System.currentTimeMillis();
         ZipOutputStream zos = null;
         try {
@@ -264,14 +369,14 @@ public class CommonUtil {
             System.out.println("Compress Complete,Timeuse:" + (end - start) + " ms");
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("System Error:"+e);
+            System.err.println("System Error:" + e);
         } finally {
             if (zos != null) {
                 try {
                     zos.close();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    System.err.println("System Error:"+e);
+                    System.err.println("System Error:" + e);
                 }
             }
         }
@@ -308,13 +413,13 @@ public class CommonUtil {
                 }
             }
             zos.flush();
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("System Error:"+e);
+            System.err.println("System Error:" + e);
         }
     }
 
-    public static void uploadToS3(String bucketName,String outputPath,String filePath){
+    public static void uploadToS3(String bucketName, String outputPath, String filePath) {
         try {
             FileInputStream fileInputStream = new FileInputStream(new File(filePath));
             ObjectMetadata objectMetadata = new ObjectMetadata();
@@ -330,7 +435,7 @@ public class CommonUtil {
             } else {
                 System.out.println("Upload Failed!");
             }
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
