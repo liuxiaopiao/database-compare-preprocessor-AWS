@@ -349,10 +349,10 @@ public class CommonUtil {
 
         File file=new File(path);
 
-        if(file.exists()){
-            file.delete();
-            System.out.println("Delete Old File!");
-        }
+//        if(file.exists()){
+//            file.delete();
+//            System.out.println("Delete Old File!");
+//        }
 
         if(!file.exists()){
             new File(file.getParent()).mkdirs();

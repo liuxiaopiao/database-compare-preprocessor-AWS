@@ -63,6 +63,11 @@ public class ExtractDataFromDB {
                 statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
                 statement.setFetchSize(1000);
                 String path=fileDestPath+schemaPattern+"_"+tableName;
+                File file=new File(path);
+                if(file.exists()){
+                    file.delete();
+                    System.out.println("Delete Old File!");
+                }
 
                 if ("oracle".equalsIgnoreCase(DBTag)) {
                     if(primaryKeyList.size()!=0){
