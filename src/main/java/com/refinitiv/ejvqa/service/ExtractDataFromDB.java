@@ -2,11 +2,14 @@ package com.refinitiv.ejvqa.service;
 
 import com.refinitiv.ejvqa.util.CommonUtil;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 
@@ -17,8 +20,9 @@ public class ExtractDataFromDB {
         Connection connection=null;
         DatabaseMetaData databaseMetaData=null;
         Statement statement=null;
-        LinkedHashSet<String> tableNameSet=null;
-        LinkedList<String> primaryKeyList=null;
+        LinkedHashSet<String> tableNameSet=new LinkedHashSet<>();
+        LinkedHashMap<String,String> tableNameToPrimaryKeyMap=new LinkedHashMap<>();
+        LinkedHashMap<String,String> tableNameToColumnLabelMap=new LinkedHashMap<>();
         FileOutputStream fileOutputStream=null;
         if (fileDestPath.equalsIgnoreCase("local")) {
             fileDestPath = System.getProperty("user.dir") + "/output/";
@@ -33,17 +37,27 @@ public class ExtractDataFromDB {
                 tableNamePath = System.getProperty("user.dir") + "/src/data/TableName.xlsx";
                 tableNameSet = CommonUtil.generateTableNameFromExcel(tableNamePath);
             } else if (tableNamePath.endsWith(".xlsx")) {
-                tableNameSet = CommonUtil.generateTableNameFromExcel(tableNamePath);
+                File file=new File(tableNamePath);
+                CommonUtil.getSQLInfoFromExcel(file,tableNameSet,tableNameToPrimaryKeyMap,tableNameToColumnLabelMap);
             } else {
                 tableNameSet = new LinkedHashSet<String>();
                 tableNameSet.add(tableNamePath);
             }
 
             for (String tableName : tableNameSet) {
+                System.out.println();
                 System.out.println(tableName);
+                LinkedList<String> primaryKeyList=new LinkedList<>();
                 connection = CommonUtil.createConnection(DBTag, connection, ip_port, databaseName1, username, password);
                 databaseMetaData = CommonUtil.generateDatabaseMetaData(connection);
-                primaryKeyList=CommonUtil.generatePrimaryKeys(databaseMetaData,schemaPattern,tableName);
+                if(tableNamePath.endsWith(".xlsx")){
+                    String[] primarykeys=tableNameToPrimaryKeyMap.get(tableName).split(",");
+                    for(int i=0;i<primarykeys.length;i++) {
+                        primaryKeyList.add(primarykeys[i]);
+                    }
+                }else {
+                    primaryKeyList = CommonUtil.generatePrimaryKeys(databaseMetaData, schemaPattern, tableName);
+                }
                 StringBuilder primaryKeys=new StringBuilder();
                 String sql=null;
                 statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
@@ -64,16 +78,24 @@ public class ExtractDataFromDB {
                             sql ="select * from "+schemaPattern+"."+tableName+" order by "+primaryKeys;
                         }
                     }
-//                    else {
-//                        if(!"*".equalsIgnoreCase(extractNum)) {
-//                            sql = "select * from (select * from " + schemaPattern + "." + tableName + " order by OBJECTPERMID) where  rownum <=" + extractNum;
-//                        }else{
-//                            sql="select * from " + schemaPattern + "." + tableName + " order by OBJECTPERMID";
-//                        }
-//                    }
+                    else {
+                        if(!"*".equalsIgnoreCase(extractNum)) {
+                            if(tableName.contains("COMMENT")) {
+                                sql = "select * from (select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) where  rownum <=" + extractNum;
+                            }else if(tableName.contains("OBJECTLIST")){
+                                sql = "select * from (select * from " + schemaPattern + "." + tableName + " order by OBJECTPATH) where  rownum <=" + extractNum;
+                            }
+                        }else{
+                            if(tableName.contains("COMMENT")) {
+                                sql = "select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM";
+                            }else if(tableName.contains("OBJECTLIST")){
+                                sql = "select * from " + schemaPattern + "." + tableName + " order by OBJECTPATH";
+                            }
+                        }
+                    }
                     System.out.println(sql);
 
-                    CommonUtil.extractDataBySQL(statement,sql,path);
+                    CommonUtil.extractDataBySQL(statement,sql,path,primaryKeyList);
                 }
             }
         }catch(Exception e){

@@ -7,6 +7,8 @@ import javax.swing.*;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.regex.Pattern;
 
 public class SampleTest {
@@ -90,4 +92,15 @@ public class SampleTest {
         connection=CommonUtil.createConnection("mssql",connection,ip_port,"qai_master",username,pwd);
     }
 
+    @Test
+    public void getSQLInfoFromExcelTest(){
+
+        String path=System.getProperty("user.dir")+"/src/data/BIMBQMTOCIQM_CCRMapping.xlsx";
+        File file=new File(path);
+        LinkedHashSet<String> tableNameSet=new LinkedHashSet<>();
+        LinkedHashMap<String,String> tableNameToPrimaryKeyMap=new LinkedHashMap<>();
+        LinkedHashMap<String,String> tableNameToColumnLabelMap=new LinkedHashMap<>();
+
+        CommonUtil.getSQLInfoFromExcel(file,tableNameSet,tableNameToPrimaryKeyMap,tableNameToColumnLabelMap);
+    }
 }

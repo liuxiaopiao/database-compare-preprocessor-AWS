@@ -113,6 +113,47 @@ public class CommonUtil {
         return tableNameSet;
     }
 
+    public static void getSQLInfoFromExcel(File file,LinkedHashSet<String> tableNameSet,LinkedHashMap<String,String> tableNameToPrimaryKey,LinkedHashMap<String,String> tableNameToColumnLabel){
+        FileInputStream fis=null;
+        try {
+            fis = new FileInputStream(file);
+            if (file.exists() && file.getName().endsWith(".xlsx")) {
+                XSSFWorkbook xssfWb = new XSSFWorkbook(fis);
+                XSSFSheet xsfSheet = xssfWb.getSheetAt(0);
+                for (int i = 1; i < xsfSheet.getPhysicalNumberOfRows(); i++) {
+                    Row oneRow = xsfSheet.getRow(i);
+                    Cell tableName = oneRow.getCell(0);
+                    if (tableName != null) {
+                        tableNameSet.add(tableName.getStringCellValue());
+                    }
+                    Cell primaryKey = oneRow.getCell(1);
+                    if (tableName != null && primaryKey != null) {
+                        tableNameToPrimaryKey.put(tableName.getStringCellValue(), primaryKey.getStringCellValue());
+                    }
+                    Cell columnLabel = oneRow.getCell(2);
+                    if (tableName != null && columnLabel != null) {
+                        tableNameToColumnLabel.put(tableName.getStringCellValue(), columnLabel.getStringCellValue());
+                    }
+
+                }
+                xssfWb.close();
+                ;
+            }
+            System.out.println(tableNameSet);
+            System.out.println(tableNameToPrimaryKey);
+            System.out.println(tableNameToColumnLabel);
+        }catch(IOException e){
+            e.printStackTrace();
+        }finally {
+            try {
+                fis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     public static LinkedHashSet<String> generateViewNames(DatabaseMetaData databaseMetaData, String schemaPattern) throws SQLException {
         viewNameSet = new LinkedHashSet<String>();
         ResultSet viewSet = databaseMetaData.getTables(null, schemaPattern, "%", new String[]{"VIEW"});
@@ -241,7 +282,7 @@ public class CommonUtil {
         }
     }
 
-    public static void extractDataBySQL(Statement statement,String sql,String path) throws SQLException, IOException {
+    public static void extractDataBySQL(Statement statement,String sql,String path,LinkedList<String> primaryKeyList) throws SQLException, IOException {
         ResultSet resultSet=statement.executeQuery(sql);
         resultSet.last();
         int lastIndex=resultSet.getRow();
