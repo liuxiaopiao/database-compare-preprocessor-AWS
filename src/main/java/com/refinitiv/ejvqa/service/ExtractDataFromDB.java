@@ -18,7 +18,7 @@ public class ExtractDataFromDB {
         LinkedHashMap<String,String> tableNameToPrimaryKeyMap=new LinkedHashMap<>();
         LinkedHashMap<String,String> tableNameToColumnLabelMap=new LinkedHashMap<>();
         FileOutputStream fileOutputStream=null;
-        int startNum=Integer.parseInt(extractNum);
+
         if (fileDestPath.equalsIgnoreCase("local")) {
             fileDestPath = System.getProperty("user.dir") + "/output/";
         }
@@ -40,6 +40,7 @@ public class ExtractDataFromDB {
             }
 
             for (String tableName : tableNameSet) {
+                int startNum=Integer.parseInt(extractNum);
                 System.out.println();
                 System.out.println(tableName);
                 LinkedList<String> primaryKeyList=new LinkedList<>();
@@ -79,14 +80,14 @@ public class ExtractDataFromDB {
 
 
                             if (!"*".equalsIgnoreCase(extractNum)) {
-                                sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys + ") a where rownum <" + (startNum + 1000) + ") where rn >=" + startNum;
+                                sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys + ") a where rownum <" + (startNum + 10000) + ") where rn >=" + startNum;
                             } else {
                                 sql = "select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys;
                             }
                         } else {
                             if (!"*".equalsIgnoreCase(extractNum)) {
                                 if (tableName.contains("COMMENT")) {
-                                    sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 1000) + ") where rn >=" + startNum;
+                                    sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 10000) + ") where rn >=" + startNum;
                                 } else if (tableName.contains("OBJECTLIST")) {
                                     sql = "select * from (select * from " + schemaPattern + "." + tableName + " order by OBJECTPATH) where  rownum <=" + extractNum;
                                 }
@@ -144,7 +145,7 @@ public class ExtractDataFromDB {
                             pageData.add(rowData.toString());
                             rowData.setLength(0);
 
-                            if(j%1000==0){
+                            if(j%10000==0){
                                 CommonUtil.writeFile(pageData,path);
                                 pageData.clear();
                                 timeuse=System.currentTimeMillis();
@@ -153,7 +154,7 @@ public class ExtractDataFromDB {
                             }
                         }
 
-                        if(j%1000!=0){
+                        if(j%10000!=0){
                             CommonUtil.writeFile(pageData,path);
                         }
 
