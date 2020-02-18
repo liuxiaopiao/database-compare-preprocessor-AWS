@@ -4,14 +4,8 @@ import com.refinitiv.ejvqa.util.CommonUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.sql.Connection;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
-import java.sql.Statement;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
+import java.sql.*;
+import java.util.*;
 
 public class ExtractDataFromDB {
 
@@ -24,6 +18,7 @@ public class ExtractDataFromDB {
         LinkedHashMap<String,String> tableNameToPrimaryKeyMap=new LinkedHashMap<>();
         LinkedHashMap<String,String> tableNameToColumnLabelMap=new LinkedHashMap<>();
         FileOutputStream fileOutputStream=null;
+        int startNum=Integer.parseInt(extractNum);
         if (fileDestPath.equalsIgnoreCase("local")) {
             fileDestPath = System.getProperty("user.dir") + "/output/";
         }
@@ -58,7 +53,7 @@ public class ExtractDataFromDB {
                 }else {
                     primaryKeyList = CommonUtil.generatePrimaryKeys(databaseMetaData, schemaPattern, tableName);
                 }
-                StringBuilder primaryKeys=new StringBuilder();
+
                 String sql=null;
                 statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
                 statement.setFetchSize(1000);
@@ -70,41 +65,105 @@ public class ExtractDataFromDB {
                 }
 
                 if ("oracle".equalsIgnoreCase(DBTag)) {
-                    if(primaryKeyList.size()!=0){
-                        for(String primaryKey:primaryKeyList){
-                            primaryKeys.append(primaryKey+",");
-                        }
-                        primaryKeys.deleteCharAt(primaryKeys.length()-1);
-                        System.out.println(primaryKeys.toString());
-
-                        if(!"*".equalsIgnoreCase(extractNum)) {
-                            sql = "select * from (select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys + ") where rownum <=" + extractNum;
-                        }else{
-                            sql ="select * from "+schemaPattern+"."+tableName+" order by "+primaryKeys;
-                        }
-                    }
-                    else {
-                        if(!"*".equalsIgnoreCase(extractNum)) {
-                            if(tableName.contains("COMMENT")) {
-                                sql = "select * from (select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) where  rownum <=" + extractNum;
-                            }else if(tableName.contains("OBJECTLIST")){
-                                sql = "select * from (select * from " + schemaPattern + "." + tableName + " order by OBJECTPATH) where  rownum <=" + extractNum;
+                    long start = System.currentTimeMillis();
+                    boolean flag=true;
+                    while(flag) {
+                        flag=false;
+                        StringBuilder primaryKeys=new StringBuilder();
+                        if (primaryKeyList.size() != 0) {
+                            for (String primaryKey : primaryKeyList) {
+                                primaryKeys.append(primaryKey + ",");
                             }
-                        }else{
-                            if(tableName.contains("COMMENT")) {
-                                sql = "select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM";
-                            }else if(tableName.contains("OBJECTLIST")){
-                                sql = "select * from " + schemaPattern + "." + tableName + " order by OBJECTPATH";
+                            primaryKeys.deleteCharAt(primaryKeys.length() - 1);
+                            System.out.println(primaryKeys.toString());
+
+
+                            if (!"*".equalsIgnoreCase(extractNum)) {
+                                sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys + ") a where rownum <" + (startNum + 1000) + ") where rn >=" + startNum;
+                            } else {
+                                sql = "select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys;
+                            }
+                        } else {
+                            if (!"*".equalsIgnoreCase(extractNum)) {
+                                if (tableName.contains("COMMENT")) {
+                                    sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 1000) + ") where rn >=" + startNum;
+                                } else if (tableName.contains("OBJECTLIST")) {
+                                    sql = "select * from (select * from " + schemaPattern + "." + tableName + " order by OBJECTPATH) where  rownum <=" + extractNum;
+                                }
+                            } else {
+                                if (tableName.contains("COMMENT")) {
+                                    sql = "select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM";
+                                } else if (tableName.contains("OBJECTLIST")) {
+                                    sql = "select * from " + schemaPattern + "." + tableName + " order by OBJECTPATH";
+                                }
                             }
                         }
-                    }
-                    System.out.println(sql);
+                        System.out.println(sql);
 
-                    long start=System.currentTimeMillis();
-                    CommonUtil.extractDataBySQL(statement,sql,path,primaryKeyList);
-                    CommonUtil.gzipFile(path,schemaPattern,tableName);
-                    long end=System.currentTimeMillis();
-                    System.out.println("\r\nTotal Timeuse is: "+(end-start)+"ms");
+                        ResultSet resultSet=statement.executeQuery(sql);
+                        resultSet.last();
+                        int lastIndex=resultSet.getRow();
+                        System.out.println("The Extract number of records is: "+lastIndex);
+                        resultSet.beforeFirst();
+                        ResultSetMetaData resultSetMetaData=resultSet.getMetaData();
+
+                        long begin=System.currentTimeMillis();
+                        long loopBegin=begin;
+                        long timeuse=0;
+                        System.out.println("Starting extract data......");
+
+                        StringBuilder rowData=new StringBuilder();
+                        List<String> pageData=new LinkedList<>();
+
+                        int j=0;
+                        int columnCount=resultSetMetaData.getColumnCount();
+
+                        if(primaryKeyList.size()!=0){
+                            rowData.append("PrimaryKey|");
+                        }
+                        for(int i=1;i<=columnCount;i++){
+                            rowData.append(resultSetMetaData.getColumnLabel(i)+"|");
+                        }
+                        rowData.append("\r\n");
+
+                        while(resultSet.next()){
+                            flag=true;
+                            startNum++;
+                            j++;
+                            if(primaryKeyList.size()!=0){
+                                for(String primaryKey:primaryKeyList){
+                                    rowData.append(resultSet.getString(primaryKey));
+                                }
+                                rowData.append("|");
+                            }
+                            for(int i=1;i<=columnCount;i++){
+                                rowData.append(resultSet.getString(i)+"|");
+                            }
+                            rowData.append("\r\n");
+
+                            pageData.add(rowData.toString());
+                            rowData.setLength(0);
+
+                            if(j%1000==0){
+                                CommonUtil.writeFile(pageData,path);
+                                pageData.clear();
+                                timeuse=System.currentTimeMillis();
+                                System.out.println("Output "+j+" rows,Timeuse: "+(timeuse-loopBegin)+"ms");
+                                loopBegin=timeuse;
+                            }
+                        }
+
+                        if(j%1000!=0){
+                            CommonUtil.writeFile(pageData,path);
+                        }
+
+                        long end=System.currentTimeMillis();
+                        System.out.println("Extraction total timeuse is: "+(end-begin)+"ms");
+                    }
+
+                    CommonUtil.gzipFile(path, schemaPattern, tableName);
+                    long end = System.currentTimeMillis();
+                    System.out.println("\r\nTotal Timeuse is: " + (end - start) + "ms");
                 }
             }
         }catch(Exception e){

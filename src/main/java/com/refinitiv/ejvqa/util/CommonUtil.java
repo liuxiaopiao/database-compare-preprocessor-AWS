@@ -282,7 +282,7 @@ public class CommonUtil {
         }
     }
 
-    public static void extractDataBySQL(Statement statement,String sql,String path,LinkedList<String> primaryKeyList) throws SQLException, IOException {
+    public static void extractDataBySQL(Statement statement,String sql,String path,LinkedList<String> primaryKeyList,boolean flag,int startNum) throws SQLException, IOException {
         ResultSet resultSet=statement.executeQuery(sql);
         resultSet.last();
         int lastIndex=resultSet.getRow();
@@ -310,6 +310,8 @@ public class CommonUtil {
         rowData.append("\r\n");
 
         while(resultSet.next()){
+            flag=true;
+            startNum++;
             j++;
             if(primaryKeyList.size()!=0){
                 for(String primaryKey:primaryKeyList){
