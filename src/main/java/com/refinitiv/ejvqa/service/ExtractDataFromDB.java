@@ -95,7 +95,11 @@ public class ExtractDataFromDB {
                     }
                     System.out.println(sql);
 
+                    long start=System.currentTimeMillis();
                     CommonUtil.extractDataBySQL(statement,sql,path,primaryKeyList);
+                    CommonUtil.gzipFile(path,schemaPattern,tableName);
+                    long end=System.currentTimeMillis();
+                    System.out.println("\r\nTotal Timeuse is: "+(end-start)+"ms");
                 }
             }
         }catch(Exception e){

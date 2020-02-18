@@ -339,7 +339,7 @@ public class CommonUtil {
         }
 
         long end=System.currentTimeMillis();
-        System.out.println("Total timeuse is: "+(end-begin)+"ms");
+        System.out.println("Extraction total timeuse is: "+(end-begin)+"ms");
     }
 
     public static void writeFile(List<String> data,String path) throws IOException {
@@ -372,6 +372,31 @@ public class CommonUtil {
         bufferedWriter.close();
         outputStreamWriter.close();
         fileOutputStream.close();
+    }
+
+    public static void gzipFile(String path,String schemaPattern,String tableName){
+        try {
+            File file = new File(path);
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            File fileout = new File((file.getParent() + "/"+schemaPattern));
+            if (!fileout.exists()) {
+                fileout.mkdir();
+            }
+            BufferedOutputStream bos = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(fileout + "/" + schemaPattern + "_" + tableName + ".gz")));
+            System.out.println("Start writing the Gzip file...");
+            long start = System.currentTimeMillis();
+            int c;
+            while ((c = br.read()) != -1) {
+                bos.write(String.valueOf((char) c).getBytes());
+                bos.flush();
+            }
+            br.close();
+            bos.close();
+            long end = System.currentTimeMillis();
+            System.out.println("Compress Complete!!! Timeuse:" + (end - start) + "ms");
+        }catch(IOException e){
+            e.printStackTrace();
+        }
     }
 
     public static void deleteOnlyFile(String fileDestPath) {
