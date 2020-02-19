@@ -57,7 +57,7 @@ public class ExtractDataFromDB {
 
                 String sql=null;
                 statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
-                statement.setFetchSize(1000);
+                statement.setFetchSize(10000);
                 String path=fileDestPath+schemaPattern+"_"+tableName;
                 File file=new File(path);
                 if(file.exists()){
@@ -80,14 +80,14 @@ public class ExtractDataFromDB {
 
 
                             if (!"*".equalsIgnoreCase(extractNum)) {
-                                sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys + ") a where rownum <" + (startNum + 10000) + ") where rn >=" + startNum;
+                                sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys + ") a where rownum <" + (startNum + 100000) + ") where rn >=" + startNum;
                             } else {
                                 sql = "select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys;
                             }
                         } else {
                             if (!"*".equalsIgnoreCase(extractNum)) {
                                 if (tableName.contains("COMMENT")) {
-                                    sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 10000) + ") where rn >=" + startNum;
+                                    sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 100000) + ") where rn >=" + startNum;
                                 } else if (tableName.contains("OBJECTLIST")) {
                                     sql = "select * from (select * from " + schemaPattern + "." + tableName + " order by OBJECTPATH) where  rownum <=" + extractNum;
                                 }
@@ -100,8 +100,10 @@ public class ExtractDataFromDB {
                             }
                         }
                         System.out.println(sql);
-
+                        long dbstart=System.currentTimeMillis();
                         ResultSet resultSet=statement.executeQuery(sql);
+                        long dbend=System.currentTimeMillis();
+                        System.out.println("Time to interact with the database is: "+(dbend-dbstart)+"ms");
                         resultSet.last();
                         int lastIndex=resultSet.getRow();
                         System.out.println("The Extract number of records is: "+lastIndex);
