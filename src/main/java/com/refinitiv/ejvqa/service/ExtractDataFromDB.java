@@ -13,7 +13,6 @@ public class ExtractDataFromDB {
 
         Connection connection=null;
         DatabaseMetaData databaseMetaData=null;
-        Statement statement=null;
         LinkedHashSet<String> tableNameSet=new LinkedHashSet<>();
         LinkedHashMap<String,String> tableNameToPrimaryKeyMap=new LinkedHashMap<>();
         LinkedHashMap<String,String> tableNameToColumnLabelMap=new LinkedHashMap<>();
@@ -56,8 +55,6 @@ public class ExtractDataFromDB {
                 }
 
                 String sql=null;
-                statement = connection.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_UPDATABLE);
-                statement.setFetchSize(10000);
                 String path=fileDestPath+schemaPattern+"_"+tableName;
                 File file=new File(path);
                 if(file.exists()){
@@ -101,7 +98,9 @@ public class ExtractDataFromDB {
                         }
                         System.out.println(sql);
                         long dbstart=System.currentTimeMillis();
-                        ResultSet resultSet=statement.executeQuery(sql);
+                        PreparedStatement preparedStatement= connection.prepareStatement(sql);
+                        preparedStatement.setFetchSize(10000);
+                        ResultSet resultSet=preparedStatement.executeQuery();
                         long dbend=System.currentTimeMillis();
                         System.out.println("Time to interact with the database is: "+(dbend-dbstart)+"ms");
 //                        resultSet.last();
@@ -163,10 +162,9 @@ public class ExtractDataFromDB {
                         long end=System.currentTimeMillis();
                         System.out.println("Extraction total timeuse is: "+(end-begin)+"ms");
                         resultSet.close();
+                        preparedStatement.close();
                     }
 
-
-                    statement.close();
                     connection.close();
 
                     CommonUtil.gzipFile(path, schemaPattern, tableName);
