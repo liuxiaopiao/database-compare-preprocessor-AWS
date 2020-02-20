@@ -80,14 +80,14 @@ public class ExtractDataFromDB {
 
 
                             if (!"*".equalsIgnoreCase(extractNum)) {
-                                sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys + ") a where rownum <" + (startNum + 100000) + ") where rn >=" + startNum;
+                                sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys + ") a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
                             } else {
                                 sql = "select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys;
                             }
                         } else {
                             if (!"*".equalsIgnoreCase(extractNum)) {
                                 if (tableName.contains("COMMENT")) {
-                                    sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 100000) + ") where rn >=" + startNum;
+                                    sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
                                 } else if (tableName.contains("OBJECTLIST")) {
                                     sql = "select * from (select * from " + schemaPattern + "." + tableName + " order by OBJECTPATH) where  rownum <=" + extractNum;
                                 }
@@ -104,10 +104,10 @@ public class ExtractDataFromDB {
                         ResultSet resultSet=statement.executeQuery(sql);
                         long dbend=System.currentTimeMillis();
                         System.out.println("Time to interact with the database is: "+(dbend-dbstart)+"ms");
-                        resultSet.last();
-                        int lastIndex=resultSet.getRow();
-                        System.out.println("The Extract number of records is: "+lastIndex);
-                        resultSet.beforeFirst();
+//                        resultSet.last();
+//                        int lastIndex=resultSet.getRow();
+//                        System.out.println("The Extract number of records is: "+lastIndex);
+//                        resultSet.beforeFirst();
                         ResultSetMetaData resultSetMetaData=resultSet.getMetaData();
 
                         long begin=System.currentTimeMillis();
@@ -147,7 +147,7 @@ public class ExtractDataFromDB {
                             pageData.add(rowData.toString());
                             rowData.setLength(0);
 
-                            if(j%10000==0){
+                            if(j%500000==0){
                                 CommonUtil.writeFile(pageData,path);
                                 pageData.clear();
                                 timeuse=System.currentTimeMillis();
@@ -156,13 +156,18 @@ public class ExtractDataFromDB {
                             }
                         }
 
-                        if(j%10000!=0){
+                        if(j%500000!=0){
                             CommonUtil.writeFile(pageData,path);
                         }
 
                         long end=System.currentTimeMillis();
                         System.out.println("Extraction total timeuse is: "+(end-begin)+"ms");
+                        resultSet.close();
                     }
+
+
+                    statement.close();
+                    connection.close();
 
                     CommonUtil.gzipFile(path, schemaPattern, tableName);
                     long end = System.currentTimeMillis();
