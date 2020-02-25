@@ -53,6 +53,10 @@ public class ExtractDataFromDB {
                 }else {
                     primaryKeyList = CommonUtil.generatePrimaryKeys(databaseMetaData, schemaPattern, tableName);
                 }
+                String selectContent="*";
+                if(tableNamePath.endsWith(".xlsx")){
+                    selectContent=tableNameToColumnLabelMap.get(tableName);
+                }
 
                 String sql=null;
                 String path=fileDestPath+schemaPattern+"_"+tableName;
@@ -77,22 +81,22 @@ public class ExtractDataFromDB {
 
 
                             if (!"*".equalsIgnoreCase(extractNum)) {
-                                sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys + ") a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
+                                sql = "select * from (select a.*,rownum rn from (select "+selectContent+" from " + schemaPattern + "." + tableName + " order by " + primaryKeys + ") a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
                             } else {
-                                sql = "select * from " + schemaPattern + "." + tableName + " order by " + primaryKeys;
+                                sql = "select "+selectContent+" from " + schemaPattern + "." + tableName + " order by " + primaryKeys;
                             }
                         } else {
                             if (!"*".equalsIgnoreCase(extractNum)) {
                                 if (tableName.contains("COMMENT")) {
-                                    sql = "select * from (select a.*,rownum rn from (select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
+                                    sql = "select * from (select a.*,rownum rn from (select "+selectContent+" from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
                                 } else if (tableName.contains("OBJECTLIST")) {
-                                    sql = "select * from (select * from " + schemaPattern + "." + tableName + " order by OBJECTPATH) where  rownum <=" + extractNum;
+                                    sql = "select * from (select "+selectContent+" from " + schemaPattern + "." + tableName + " order by OBJECTPATH) where  rownum <=" + extractNum;
                                 }
                             } else {
                                 if (tableName.contains("COMMENT")) {
-                                    sql = "select * from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM";
+                                    sql = "select "+selectContent+" from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM";
                                 } else if (tableName.contains("OBJECTLIST")) {
-                                    sql = "select * from " + schemaPattern + "." + tableName + " order by OBJECTPATH";
+                                    sql = "select "+selectContent+" from " + schemaPattern + "." + tableName + " order by OBJECTPATH";
                                 }
                             }
                         }
