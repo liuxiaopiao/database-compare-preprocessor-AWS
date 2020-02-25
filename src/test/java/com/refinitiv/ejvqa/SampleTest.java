@@ -103,4 +103,18 @@ public class SampleTest {
 
         CommonUtil.getSQLInfoFromExcel(file,tableNameSet,tableNameToPrimaryKeyMap,tableNameToColumnLabelMap);
     }
+
+    @Test
+    public void decomposeGzipFileTest(){
+        try {
+            String dest = "C:/";
+            String folder = "Data";
+            File file1 = new File("C:/sb_CCPASDI_QUOTECOMMENT_BKP.gz");
+            File file2 = new File("C:/ss_CCPASDI_QUOTECOMMENT_BKP.gz");
+            CommonUtil.decomposeGzipFile(file1, folder, dest);
+            CommonUtil.decomposeGzipFile(file2,folder,dest);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

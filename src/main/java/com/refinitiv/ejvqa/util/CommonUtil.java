@@ -12,6 +12,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.*;
 import java.sql.*;
 import java.util.*;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -399,6 +400,95 @@ public class CommonUtil {
         }catch(IOException e){
             e.printStackTrace();
         }
+    }
+
+    public static void decomposeGzipFile(File file,String folder,String dest) throws IOException {
+        String fileName=file.getName();
+        String realFilename=null;
+        String fileFolder=null;
+        String realFolder=null;
+        GZIPInputStream gis=new GZIPInputStream(new FileInputStream(file));
+        BufferedReader br=new BufferedReader(new InputStreamReader(gis));
+        boolean flag=true;
+        String line=null;
+        List<String> page=new LinkedList<>();
+
+        int j = 0;
+        int num = 0;
+
+        while ((line = br.readLine()) != null) {
+            j++;
+            page.add(line);
+            if(line.endsWith("|")){
+                page.add("\r\n");
+            }
+
+            if (j % 1000 == 0) {
+                num++;
+                realFilename = fileName.substring(0,fileName.length()-3) + num;
+                fileFolder=fileName.substring(3,fileName.length()-3)+num;
+                if (num % 4 == 0) {
+                    realFolder = folder + 0;
+                } else if (num % 4 == 1) {
+                    realFolder = folder + 1;
+                } else if (num % 4 == 2) {
+                    realFolder = folder + 2;
+                } else {
+                    realFolder = folder + 3;
+                }
+                String destPath = dest + "/" + realFolder + "/" + "/"+fileFolder+"/"+realFilename + ".gz";
+                writeGzipFile(page, destPath);
+                page.clear();
+            }
+        }
+
+        if (j % 1000 != 0) {
+            num++;
+            realFilename = fileName.substring(0,fileName.length()-3) + num;
+            fileFolder=fileName.substring(3,fileName.length()-3)+num;
+            if (num % 4 == 0) {
+                realFolder = folder + 0;
+            } else if (num % 4 == 1) {
+                realFolder = folder + 1;
+            } else if (num % 4 == 2) {
+                realFolder = folder + 2;
+            } else {
+                realFolder = folder + 3;
+            }
+            String destPath = dest + "/" + realFolder + "/" + "/"+fileFolder+"/"+realFilename + ".gz";
+            writeGzipFile(page, destPath);
+        }
+
+        br.close();
+        gis.close();
+
+    }
+
+    public static void writeGzipFile(List<String> data,String destPath) throws IOException {
+        if(null==data||data.size()==0){
+            return;
+        }
+
+        File file=new File(destPath);
+
+        if(!file.exists()){
+            new File(file.getParent()).mkdirs();
+            file.createNewFile();
+            System.out.println("Create New File!");
+        }
+
+        FileOutputStream fileOutputStream=new FileOutputStream(destPath,true);
+        GZIPOutputStream gos=new GZIPOutputStream(fileOutputStream);
+        BufferedWriter bufferedWriter=new BufferedWriter(new OutputStreamWriter(gos));
+
+        for(String row:data){
+            bufferedWriter.write(row);
+            bufferedWriter.flush();
+        }
+
+        bufferedWriter.close();
+        gos.close();
+        fileOutputStream.close();
     }
 
     public static void deleteOnlyFile(String fileDestPath) {
