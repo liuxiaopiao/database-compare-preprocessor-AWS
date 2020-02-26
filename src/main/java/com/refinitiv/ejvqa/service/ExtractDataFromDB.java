@@ -9,7 +9,7 @@ import java.util.*;
 
 public class ExtractDataFromDB {
 
-    public void extractDataFromDb(String DBTag, String ip_port, String databaseName1, String username, String password, String tableNamePath, String schemaPattern, String extractNum, String fileDestPath){
+    public void extractDataFromDb(String DBTag, String ip_port, String databaseName1, String username, String password, String tableNamePath, String schemaPattern, String filter,String extractNum, String fileDestPath){
 
         Connection connection=null;
         DatabaseMetaData databaseMetaData=null;
@@ -54,7 +54,7 @@ public class ExtractDataFromDB {
                     primaryKeyList = CommonUtil.generatePrimaryKeys(databaseMetaData, schemaPattern, tableName);
                 }
                 String selectContent="*";
-                if(tableNamePath.endsWith(".xlsx")){
+                if(tableNameToColumnLabelMap.get(tableName)!=null||!"".equals(tableNameToColumnLabelMap.get(tableName))){
                     selectContent=tableNameToColumnLabelMap.get(tableName);
                 }
 
@@ -81,22 +81,22 @@ public class ExtractDataFromDB {
 
 
                             if (!"*".equalsIgnoreCase(extractNum)) {
-                                sql = "select * from (select a.*,rownum rn from (select "+selectContent+" from " + schemaPattern + "." + tableName + " order by " + primaryKeys + ") a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
+                                sql = "select * from (select a.*,rownum rn from (select "+selectContent+" from " + schemaPattern + "." + tableName +filter+ " order by " + primaryKeys + ") a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
                             } else {
-                                sql = "select "+selectContent+" from " + schemaPattern + "." + tableName + " order by " + primaryKeys;
+                                sql = "select "+selectContent+" from " + schemaPattern + "." + tableName +filter+ " order by " + primaryKeys;
                             }
                         } else {
                             if (!"*".equalsIgnoreCase(extractNum)) {
                                 if (tableName.contains("COMMENT")) {
-                                    sql = "select * from (select a.*,rownum rn from (select "+selectContent+" from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
+                                    sql = "select * from (select a.*,rownum rn from (select "+selectContent+" from " + schemaPattern + "." + tableName +filter+ " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
                                 } else if (tableName.contains("OBJECTLIST")) {
-                                    sql = "select * from (select "+selectContent+" from " + schemaPattern + "." + tableName + " order by OBJECTPATH) where  rownum <=" + extractNum;
+                                    sql = "select * from (select "+selectContent+" from " + schemaPattern + "." + tableName +filter+ " order by OBJECTPATH) where  rownum <=" + extractNum;
                                 }
                             } else {
                                 if (tableName.contains("COMMENT")) {
-                                    sql = "select "+selectContent+" from " + schemaPattern + "." + tableName + " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM";
+                                    sql = "select "+selectContent+" from " + schemaPattern + "." + tableName +filter+ " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM";
                                 } else if (tableName.contains("OBJECTLIST")) {
-                                    sql = "select "+selectContent+" from " + schemaPattern + "." + tableName + " order by OBJECTPATH";
+                                    sql = "select "+selectContent+" from " + schemaPattern + "." + tableName +filter+ " order by OBJECTPATH";
                                 }
                             }
                         }

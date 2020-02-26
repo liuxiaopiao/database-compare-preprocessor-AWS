@@ -56,6 +56,7 @@
         <parameter name="password" value="read_only"/>
         <parameter name="tableNamePath" value="C:/Users/uc260386/database-compare-preprocessor - AWS/src/data/BIMBQMTOCIQM_CCRMapping.xlsx"/>
         <parameter name="schemaPattern" value="CIQM"/>
+        <parameter name="filter" value=" where to_char(EFFECTIVETO,'yyyy-mm-dd')='9999-12-31'"/>
         <parameter name="extractNum" value="1"/>
         <parameter name="fileDestPath" value="local"/>
         <classes>
