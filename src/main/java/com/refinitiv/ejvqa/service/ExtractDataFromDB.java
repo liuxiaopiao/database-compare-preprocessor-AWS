@@ -55,7 +55,7 @@ public class ExtractDataFromDB {
                     primaryKeyList = CommonUtil.generatePrimaryKeys(databaseMetaData, schemaPattern, tableName);
                 }
                 String selectContent="*";
-                if(tableNameToColumnLabelMap.get(tableName)!=null||!"".equals(tableNameToColumnLabelMap.get(tableName))){
+                if(tableNameToColumnLabelMap.size()!=0&&tableNameToColumnLabelMap.get(tableName)!=null){
                     selectContent=tableNameToColumnLabelMap.get(tableName);
                 }
                 String filter=" ";
@@ -143,12 +143,12 @@ public class ExtractDataFromDB {
                             j++;
                             if(primaryKeyList.size()!=0){
                                 for(String primaryKey:primaryKeyList){
-                                    rowData.append(resultSet.getString(primaryKey));
+                                    rowData.append((resultSet.getString(primaryKey)).replaceAll("\r","").replaceAll("\n","").replaceAll("\r\n",""));
                                 }
                                 rowData.append("|");
                             }
                             for(int i=1;i<columnCount;i++){
-                                rowData.append(resultSet.getString(i)+"|");
+                                rowData.append((resultSet.getString(i)).replaceAll("\r","").replaceAll("\n","").replaceAll("\r\n","")+"|");
                             }
                             rowData.append("\r\n");
 
