@@ -81,22 +81,22 @@ public class ExtractDataFromDB {
 
 
                             if (!"*".equalsIgnoreCase(extractNum)) {
-                                sql = "select * from (select a.*,rownum rn from (select "+selectContent+" from " + schemaPattern + "." + tableName +filter+ " order by " + primaryKeys + ") a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
+                                sql = "select * from (select a.*,rownum rn from (select "+selectContent+" from " + schemaPattern + "." + tableName +" "+filter+ " order by " + primaryKeys + ") a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
                             } else {
-                                sql = "select "+selectContent+" from " + schemaPattern + "." + tableName +filter+ " order by " + primaryKeys;
+                                sql = "select "+selectContent+" from " + schemaPattern + "." + tableName +" "+filter+ " order by " + primaryKeys;
                             }
                         } else {
                             if (!"*".equalsIgnoreCase(extractNum)) {
                                 if (tableName.contains("COMMENT")) {
-                                    sql = "select * from (select a.*,rownum rn from (select "+selectContent+" from " + schemaPattern + "." + tableName +filter+ " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
+                                    sql = "select * from (select a.*,rownum rn from (select "+selectContent+" from " + schemaPattern + "." + tableName +" "+filter+ " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM) a where rownum <" + (startNum + 10000000) + ") where rn >=" + startNum;
                                 } else if (tableName.contains("OBJECTLIST")) {
-                                    sql = "select * from (select "+selectContent+" from " + schemaPattern + "." + tableName +filter+ " order by OBJECTPATH) where  rownum <=" + extractNum;
+                                    sql = "select * from (select "+selectContent+" from " + schemaPattern + "." + tableName +" "+filter+ " order by OBJECTPATH) where  rownum <=" + extractNum;
                                 }
                             } else {
                                 if (tableName.contains("COMMENT")) {
-                                    sql = "select "+selectContent+" from " + schemaPattern + "." + tableName +filter+ " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM";
+                                    sql = "select "+selectContent+" from " + schemaPattern + "." + tableName +" "+filter+ " order by OBJECTID,EFFECTIVETO,EFFECTIVEFROM";
                                 } else if (tableName.contains("OBJECTLIST")) {
-                                    sql = "select "+selectContent+" from " + schemaPattern + "." + tableName +filter+ " order by OBJECTPATH";
+                                    sql = "select "+selectContent+" from " + schemaPattern + "." + tableName +" "+filter+ " order by OBJECTPATH";
                                 }
                             }
                         }
