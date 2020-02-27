@@ -132,7 +132,7 @@ public class ExtractDataFromDB {
                         if(primaryKeyList.size()!=0){
                             rowData.append("PrimaryKey|");
                         }
-                        for(int i=1;i<=columnCount;i++){
+                        for(int i=1;i<columnCount;i++){
                             rowData.append(resultSetMetaData.getColumnLabel(i)+"|");
                         }
                         rowData.append("\r\n");
@@ -147,7 +147,7 @@ public class ExtractDataFromDB {
                                 }
                                 rowData.append("|");
                             }
-                            for(int i=1;i<=columnCount;i++){
+                            for(int i=1;i<columnCount;i++){
                                 rowData.append(resultSet.getString(i)+"|");
                             }
                             rowData.append("\r\n");
