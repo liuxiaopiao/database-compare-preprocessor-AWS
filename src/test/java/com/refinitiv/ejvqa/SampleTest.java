@@ -100,8 +100,9 @@ public class SampleTest {
         LinkedHashSet<String> tableNameSet=new LinkedHashSet<>();
         LinkedHashMap<String,String> tableNameToPrimaryKeyMap=new LinkedHashMap<>();
         LinkedHashMap<String,String> tableNameToColumnLabelMap=new LinkedHashMap<>();
+        LinkedHashMap<String,String> tableNameToFilterMap=new LinkedHashMap<>();
 
-        CommonUtil.getSQLInfoFromExcel(file,tableNameSet,tableNameToPrimaryKeyMap,tableNameToColumnLabelMap);
+        CommonUtil.getSQLInfoFromExcel(file,tableNameSet,tableNameToPrimaryKeyMap,tableNameToColumnLabelMap,tableNameToFilterMap);
     }
 
     @Test

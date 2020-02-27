@@ -114,7 +114,7 @@ public class CommonUtil {
         return tableNameSet;
     }
 
-    public static void getSQLInfoFromExcel(File file,LinkedHashSet<String> tableNameSet,LinkedHashMap<String,String> tableNameToPrimaryKey,LinkedHashMap<String,String> tableNameToColumnLabel){
+    public static void getSQLInfoFromExcel(File file,LinkedHashSet<String> tableNameSet,LinkedHashMap<String,String> tableNameToPrimaryKey,LinkedHashMap<String,String> tableNameToColumnLabel,LinkedHashMap<String,String> tableNameToFilter){
         FileInputStream fis=null;
         try {
             fis = new FileInputStream(file);
@@ -134,6 +134,10 @@ public class CommonUtil {
                     Cell columnLabel = oneRow.getCell(2);
                     if (tableName != null && columnLabel != null) {
                         tableNameToColumnLabel.put(tableName.getStringCellValue(), columnLabel.getStringCellValue());
+                    }
+                    Cell filter=oneRow.getCell(3);
+                    if(tableName!=null&&filter!=null){
+                        tableNameToFilter.put(tableName.getStringCellValue(),filter.getStringCellValue());
                     }
 
                 }

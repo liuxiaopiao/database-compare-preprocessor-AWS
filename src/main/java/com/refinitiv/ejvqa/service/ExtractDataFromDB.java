@@ -9,13 +9,14 @@ import java.util.*;
 
 public class ExtractDataFromDB {
 
-    public void extractDataFromDb(String DBTag, String ip_port, String databaseName1, String username, String password, String tableNamePath, String schemaPattern, String filter,String extractNum, String fileDestPath){
+    public void extractDataFromDb(String DBTag, String ip_port, String databaseName1, String username, String password, String tableNamePath, String schemaPattern, String extractNum, String fileDestPath){
 
         Connection connection=null;
         DatabaseMetaData databaseMetaData=null;
         LinkedHashSet<String> tableNameSet=new LinkedHashSet<>();
         LinkedHashMap<String,String> tableNameToPrimaryKeyMap=new LinkedHashMap<>();
         LinkedHashMap<String,String> tableNameToColumnLabelMap=new LinkedHashMap<>();
+        LinkedHashMap<String,String> tableNameToFilterMap=new LinkedHashMap<>();
         FileOutputStream fileOutputStream=null;
 
         if (fileDestPath.equalsIgnoreCase("local")) {
@@ -32,7 +33,7 @@ public class ExtractDataFromDB {
                 tableNameSet = CommonUtil.generateTableNameFromExcel(tableNamePath);
             } else if (tableNamePath.endsWith(".xlsx")) {
                 File file=new File(tableNamePath);
-                CommonUtil.getSQLInfoFromExcel(file,tableNameSet,tableNameToPrimaryKeyMap,tableNameToColumnLabelMap);
+                CommonUtil.getSQLInfoFromExcel(file,tableNameSet,tableNameToPrimaryKeyMap,tableNameToColumnLabelMap,tableNameToFilterMap);
             } else {
                 tableNameSet = new LinkedHashSet<String>();
                 tableNameSet.add(tableNamePath);
@@ -57,9 +58,13 @@ public class ExtractDataFromDB {
                 if(tableNameToColumnLabelMap.get(tableName)!=null||!"".equals(tableNameToColumnLabelMap.get(tableName))){
                     selectContent=tableNameToColumnLabelMap.get(tableName);
                 }
+                String filter=" ";
+                if(tableNameToFilterMap.keySet().contains(tableName)&&tableNameToFilterMap.get(tableName)!=null){
+                    filter=tableNameToFilterMap.get(tableName);
+                }
 
                 String sql=null;
-                String path=fileDestPath+schemaPattern+"_"+tableName;
+                String path=fileDestPath+schemaPattern+"_"+tableName+System.currentTimeMillis();
                 File file=new File(path);
                 if(file.exists()){
                     file.delete();
