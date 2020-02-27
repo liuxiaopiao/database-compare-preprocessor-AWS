@@ -64,7 +64,8 @@ public class ExtractDataFromDB {
                 }
 
                 String sql=null;
-                String path=fileDestPath+schemaPattern+"_"+tableName+System.currentTimeMillis();
+                String fileName=tableName+System.currentTimeMillis();
+                String path=fileDestPath+schemaPattern+"_"+fileName;
                 File file=new File(path);
                 if(file.exists()){
                     file.delete();
@@ -176,7 +177,7 @@ public class ExtractDataFromDB {
 
                     connection.close();
 
-                    CommonUtil.gzipFile(path, schemaPattern, tableName);
+                    CommonUtil.gzipFile(path, schemaPattern, fileName);
                     long end = System.currentTimeMillis();
                     System.out.println("\r\nTotal Timeuse is: " + (end - start) + "ms");
                 }
