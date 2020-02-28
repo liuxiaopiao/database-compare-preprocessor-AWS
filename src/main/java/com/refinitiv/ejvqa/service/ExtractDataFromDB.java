@@ -149,7 +149,11 @@ public class ExtractDataFromDB {
                                 rowData.append("|");
                             }
                             for(int i=1;i<columnCount;i++){
-                                rowData.append((resultSet.getString(i)).replaceAll("\r","").replaceAll("\n","").replaceAll("\r\n","")+"|");
+                                if(resultSet.getString(i)!=null) {
+                                    rowData.append((resultSet.getString(i)).replaceAll("\r", "").replaceAll("\n", "").replaceAll("\r\n", "") + "|");
+                                }else{
+                                    rowData.append(resultSet.getString(i));
+                                }
                             }
                             rowData.append("\r\n");
 
