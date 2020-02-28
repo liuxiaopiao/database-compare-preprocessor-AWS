@@ -9,6 +9,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 public class SampleTest {
@@ -117,5 +119,34 @@ public class SampleTest {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void wirteFileTest(){
+        try {
+            List<String> data = new LinkedList<>();
+            data.add("2017-02-21 00:00:00196760319510SophiaAdd a new quote|196760319510|Sophia|2017-02-21 00:00:00|Add a new quote|1|\n" +
+                    "2017-02-21 00:00:00196760328011EJVQAAdd a new quote|196760328011|EJVQA|2017-02-21 00:00:00|Add a new quote|2|\n" +
+                    "2017-02-21 00:00:00196760334613EJVQAAdd a new quote|196760334613|EJVQA|2017-02-21 00:00:00|Add a new quote|3|\n" +
+                    "2017-02-21 00:00:00196760334616EJVQAAdd a new quote|196760334616|EJVQA|2017-02-21 00:00:00|Add a new quote|4|\n" +
+                    "2017-02-21 00:00:00196760334620EJVQAAdd a new quote|196760334620|EJVQA|2017-02-21 00:00:00|Add a new quote|5|\n" +
+                    "2017-02-21 00:00:00196760334624EJVQAAdd a new quote|196760334624|EJVQA|2017-02-21 00:00:00|Add a new quote|6|\n" +
+                    "2017-02-21 00:00:00196760334848EJVQAAdd a new quote|196760334848|EJVQA|2017-02-21 00:00:00|Add a new quote|7|\n" +
+                    "2017-02-21 00:00:00196760337250EJVQAAdd a new quote|196760337250|EJVQA|2017-02-21 00:00:00|Add a new quote|8|\n" +
+                    "2017-02-21 00:00:00196760337549EJVQAAdd a new quote|196760337549|EJVQA|2017-02-21 00:00:00|Add a new quote|9|\n" +
+                    "2017-02-21 00:00:00196760337552EJVQAAdd a new quote|196760337552|EJVQA|2017-02-21 00:00:00|Add a new quote|10|");
+            String path = System.getProperty("user.dir") + "/Output/testfile";
+            CommonUtil.writeFile(data, path);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void gzipFileTest(){
+        String path = System.getProperty("user.dir") + "/Output/testfile";
+        String tableName="testfile";
+        String schema="Test";
+        CommonUtil.gzipFile(path,schema,tableName);
     }
 }

@@ -384,17 +384,17 @@ public class CommonUtil {
     public static void gzipFile(String path,String schemaPattern,String tableName){
         try {
             File file = new File(path);
-            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF-8"));
             File fileout = new File((file.getParent() + "/"+schemaPattern));
             if (!fileout.exists()) {
                 fileout.mkdir();
             }
-            BufferedOutputStream bos = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(fileout + "/" + schemaPattern + "_" + tableName + ".gz")));
+            BufferedWriter bos = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(fileout + "/" + schemaPattern + "_" + tableName + ".gz")),"UTF-8"));
             System.out.println("Start writing the Gzip file...");
             long start = System.currentTimeMillis();
-            int c;
-            while ((c = br.read()) != -1) {
-                bos.write(String.valueOf((char) c).getBytes());
+            String line;
+            while ((line = br.readLine()) != null) {
+                bos.write(line+"\r\n");
                 bos.flush();
             }
             br.close();
@@ -483,7 +483,7 @@ public class CommonUtil {
 
         FileOutputStream fileOutputStream=new FileOutputStream(destPath,true);
         GZIPOutputStream gos=new GZIPOutputStream(fileOutputStream);
-        BufferedWriter bufferedWriter=new BufferedWriter(new OutputStreamWriter(gos));
+        BufferedWriter bufferedWriter=new BufferedWriter(new OutputStreamWriter(gos,"UTF-8"));
 
         for(String row:data){
             bufferedWriter.write(row);
