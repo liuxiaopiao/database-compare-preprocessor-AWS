@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<suite name="CCR Extraction Test Suite">
+
+    <test name="CCR Tables Extraction by SQL with Excel file">
+        <parameter name="DBTag" value="oracle"/>
+        <parameter name="ip_port" value="fnr-scan-ut0234.int.thomsonreuters.com:1521:oru848a1"/>
+        <parameter name="username" value="read_only"/>
+        <parameter name="password" value="read_only"/>
+        <parameter name="excelPath"
+                   value="C:/Users/uc260386/database-compare-preprocessor - AWS/src/data/CCR CompareSQL.xlsx"/>
+        <parameter name="destPath" value="local"/>
+        <classes>
+            <class name="com.refinitiv.ejvqa.ExtractDataBySQLTest"/>
+        </classes>
+    </test>
+
+</suite>
+

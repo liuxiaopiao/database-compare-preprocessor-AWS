@@ -3,7 +3,6 @@ package com.refinitiv.ejvqa.service;
 import com.refinitiv.ejvqa.util.CommonUtil;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.sql.*;
 import java.util.*;
 
@@ -17,7 +16,6 @@ public class ExtractDataFromDB {
         LinkedHashMap<String,String> tableNameToPrimaryKeyMap=new LinkedHashMap<>();
         LinkedHashMap<String,String> tableNameToColumnLabelMap=new LinkedHashMap<>();
         LinkedHashMap<String,String> tableNameToFilterMap=new LinkedHashMap<>();
-        FileOutputStream fileOutputStream=null;
 
         if (fileDestPath.equalsIgnoreCase("local")) {
             fileDestPath = System.getProperty("user.dir") + "/output/";

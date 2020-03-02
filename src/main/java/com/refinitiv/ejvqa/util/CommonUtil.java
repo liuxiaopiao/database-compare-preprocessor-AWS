@@ -159,6 +159,41 @@ public class CommonUtil {
 
     }
 
+    public static void getSQLFromExcel(File file,LinkedHashSet<String> tableNameSet,LinkedHashMap<String,String> tableNameToSQL){
+        FileInputStream fis=null;
+        try {
+            fis = new FileInputStream(file);
+            if (file.exists() && file.getName().endsWith(".xlsx")) {
+                XSSFWorkbook xssfWb = new XSSFWorkbook(fis);
+                XSSFSheet xsfSheet = xssfWb.getSheetAt(0);
+                for (int i = 1; i < xsfSheet.getPhysicalNumberOfRows(); i++) {
+                    Row oneRow = xsfSheet.getRow(i);
+                    Cell tableName = oneRow.getCell(0);
+                    if (tableName != null) {
+                        tableNameSet.add(tableName.getStringCellValue());
+                    }
+                    Cell sql = oneRow.getCell(1);
+                    if (tableName != null && sql != null) {
+                        tableNameToSQL.put(tableName.getStringCellValue(), sql.getStringCellValue());
+                    }
+
+                }
+                xssfWb.close();
+            }
+            System.out.println(tableNameSet);
+            System.out.println(tableNameToSQL);
+        }catch(IOException e){
+            e.printStackTrace();
+        }finally {
+            try {
+                fis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
     public static LinkedHashSet<String> generateViewNames(DatabaseMetaData databaseMetaData, String schemaPattern) throws SQLException {
         viewNameSet = new LinkedHashSet<String>();
         ResultSet viewSet = databaseMetaData.getTables(null, schemaPattern, "%", new String[]{"VIEW"});
@@ -389,7 +424,7 @@ public class CommonUtil {
             if (!fileout.exists()) {
                 fileout.mkdir();
             }
-            BufferedWriter bos = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(fileout + "/" + schemaPattern + "_" + tableName + ".gz")),"UTF-8"));
+            BufferedWriter bos = new BufferedWriter(new OutputStreamWriter(new GZIPOutputStream(new FileOutputStream(fileout + "/" + tableName + ".gz")),"UTF-8"));
             System.out.println("Start writing the Gzip file...");
             long start = System.currentTimeMillis();
             String line;

@@ -3,7 +3,7 @@
 
 <suite name="ViewFileGererationServiceTestSuite">
 
-<!--    <test name="Oracle extraction file generation Test with singel tableName">-->
+<!--    <test name="Oracle extraction file generation Test with CCPASDI singel tableName">-->
 <!--        <parameter name="DBTag" value="oracle"/>-->
 <!--        <parameter name="ip_port" value="fnr-scan-ut0234.int.thomsonreuters.com:1521:oru848a1"/>-->
 <!--        <parameter name="databaseName1" value="CCPASDI"/>-->
@@ -33,29 +33,14 @@
 <!--        </classes>-->
 <!--    </test>-->
 
-<!--    <test name="Oracle extraction file generation Test with Excel file">-->
-<!--        <parameter name="DBTag" value="oracle"/>-->
-<!--        <parameter name="ip_port" value="fnr-scan-ut0234.int.thomsonreuters.com:1521:oru848a1"/>-->
-<!--        <parameter name="databaseName1" value="CCPASDI"/>-->
-<!--        <parameter name="username" value="read_only"/>-->
-<!--        <parameter name="password" value="read_only"/>-->
-<!--        <parameter name="tableNamePath" value="C:/Users/uc260386/database-compare-preprocessor - AWS/src/data/BIMBQM.xlsx"/>-->
-<!--        <parameter name="schemaPattern" value="CCPASDI"/>-->
-<!--        <parameter name="extractNum" value="1"/>-->
-<!--        <parameter name="fileDestPath" value="local"/>-->
-<!--        <classes>-->
-<!--            <class name="com.refinitiv.ejvqa.ExtractDataFromDBTest"/>-->
-<!--        </classes>-->
-<!--    </test>-->
-
-    <test name="Oracle extraction file generation Test with Excel file2">
+    <test name="Oracle extraction file generation Test with BIBMQM Excel file">
         <parameter name="DBTag" value="oracle"/>
         <parameter name="ip_port" value="fnr-scan-ut0234.int.thomsonreuters.com:1521:oru848a1"/>
-        <parameter name="databaseName1" value="CIQm"/>
+        <parameter name="databaseName1" value="CCPASDI"/>
         <parameter name="username" value="read_only"/>
         <parameter name="password" value="read_only"/>
-        <parameter name="tableNamePath" value="C:/Users/uc260386/database-compare-preprocessor - AWS/src/data/CIQM.xlsx"/>
-        <parameter name="schemaPattern" value="CIQM"/>
+        <parameter name="tableNamePath" value="C:/Users/uc260386/database-compare-preprocessor - AWS/src/data/BIMBQM.xlsx"/>
+        <parameter name="schemaPattern" value="CCPASDI"/>
         <parameter name="extractNum" value="1"/>
         <parameter name="fileDestPath" value="local"/>
         <classes>
@@ -63,19 +48,5 @@
         </classes>
     </test>
 
-<!--    <test name="Oracle extraction file generation Test with All CIQM TableName">-->
-<!--        <parameter name="DBTag" value="oracle"/>-->
-<!--        <parameter name="ip_port" value="fnr-scan-ut0234.int.thomsonreuters.com:1521:oru848a1"/>-->
-<!--        <parameter name="databaseName1" value="CIQM"/>-->
-<!--        <parameter name="username" value="read_only"/>-->
-<!--        <parameter name="password" value="read_only"/>-->
-<!--        <parameter name="tableNamePath" value="C:/Users/uc260386/database-compare-preprocessor - AWS/src/data/CIQM.xlsx"/>-->
-<!--        <parameter name="schemaPattern" value="CIQM"/>-->
-<!--        <parameter name="extractNum" value="1"/>-->
-<!--        <parameter name="fileDestPath" value="local"/>-->
-<!--        <classes>-->
-<!--            <class name="com.refinitiv.ejvqa.ExtractDataFromDBTest"/>-->
-<!--        </classes>-->
-<!--    </test>-->
 </suite>
 
