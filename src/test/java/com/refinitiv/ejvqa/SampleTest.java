@@ -145,8 +145,12 @@ public class SampleTest {
     @Test
     public void gzipFileTest(){
         String path = System.getProperty("user.dir") + "/Output/testfile";
-        String tableName="testfile";
+        String path1="C:\\Data1\\Data\\bim.diff";
+        String tableName1="sb_bim.diff";
         String schema="Test";
-        CommonUtil.gzipFile(path,schema,tableName);
+        CommonUtil.gzipFile(path1,schema,tableName1);
+        String path2="C:\\Data1\\Data\\ciqm.diff";
+        String tableName2="ss_ciqm.diff";
+        CommonUtil.gzipFile(path2,schema,tableName2);
     }
 }
