@@ -33,7 +33,7 @@ public class ExtractDataBySQL {
                 System.out.println(tableName);
                 String schema = tableName.split("_")[0];
                 System.out.println(schema);
-                String folder=tableName.replaceAll("CCPASDI_","").replaceAll("CIQM_","").replaceAll("CCPOLLSDI","");
+                String folder=tableName.replaceAll("CCPASDI_","").replaceAll("CIQM_","").replaceAll("CCPOLLSDI_","");
                 System.out.println(folder);
                 connection = CommonUtil.createConnection(DBTag, connection, ip_port, schema, username, password);
 
