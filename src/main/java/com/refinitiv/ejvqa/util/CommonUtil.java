@@ -11,7 +11,10 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -636,4 +639,14 @@ public class CommonUtil {
             e.printStackTrace();
         }
     }
+
+    public static String date2UTC(String date) throws ParseException {
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date2=dateFormat.parse(date);
+        SimpleDateFormat UTCDateFormat=new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        UTCDateFormat.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        String datestr=UTCDateFormat.format(date2.getTime());
+        return datestr;
+    }
+
 }

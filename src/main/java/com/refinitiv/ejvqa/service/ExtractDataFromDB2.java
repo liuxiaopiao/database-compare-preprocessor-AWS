@@ -3,15 +3,18 @@ package com.refinitiv.ejvqa.service;
 import com.refinitiv.ejvqa.util.CommonUtil;
 
 import java.io.File;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ExtractDataBySQL {
+public class ExtractDataFromDB2 {
 
-    public void extractDataBySQL(String DBTag,String ip_port,String username,String password,String excelPath,String destPath){
+    public void extractDataFromDataBaseBySQL(String DBTag,String ip_port,String username,String password,String excelPath,String destPath,int startNum,int increment,String separator){
 
         LinkedHashSet<String> tableNameSet=new LinkedHashSet<>();
         LinkedHashMap<String,String> tableName2SQL=new LinkedHashMap<>();
@@ -37,7 +40,6 @@ public class ExtractDataBySQL {
                 System.out.println(folder);
                 connection = CommonUtil.createConnection(DBTag, connection, ip_port, schema, username, password);
 
-                int startNum = 1;
                 String sql = tableName2SQL.get(tableName);
                 String fileName = tableName + System.currentTimeMillis();
                 String filePath = destPath + fileName;
@@ -49,7 +51,7 @@ public class ExtractDataBySQL {
                         flag = false;
                         int j = 0;
 
-                        String query = "select * from (select a.*,rownum rn from (" + sql + ") a where rownum<" + (startNum + 10000000) + ") where rn>=" + startNum;
+                        String query = "select * from (select a.*,rownum rn from (" + sql + ") a where rownum<" + (startNum + increment) + ") where rn>=" + startNum;
                         System.out.println(query);
 
                         long dbbegin = System.currentTimeMillis();
@@ -70,7 +72,7 @@ public class ExtractDataBySQL {
                         List<String> pageData = new LinkedList<>();
 
                         for (int i = 1; i < columnCount; i++) {
-                            rowData.append(resultSetMetaData.getColumnLabel(i) + "|");
+                            rowData.append(resultSetMetaData.getColumnLabel(i) + separator);
                         }
                         rowData.append("\r\n");
 
@@ -81,13 +83,14 @@ public class ExtractDataBySQL {
 
                             for (int i = 1; i < columnCount; i++) {
                                 if (resultSet.getString(i) != null) {
-                                    if(resultSetMetaData.getColumnLabel(i).equalsIgnoreCase("TRANSACTIONDATE")){
-                                        rowData.append(CommonUtil.date2UTC(resultSet.getString(i))+"|");
-                                    }else {
-                                        rowData.append((resultSet.getString(i)).replaceAll("\r", "").replaceAll("\n", "").replaceAll("\r\n", "") + "|");
-                                    }
+                                    rowData.append((resultSet.getString(i)).replaceAll("\r", "").replaceAll("\n", "").replaceAll("\r\n", "") + separator);
                                 } else {
-                                    rowData.append(resultSet.getString(i) + "|");
+                                    if(resultSetMetaData.getColumnLabel(i).equalsIgnoreCase("EFFECTIVETO")){
+                                        rowData.append("9999-12-31 00:00:00"+separator);
+                                    }else{
+                                        rowData.append(resultSet.getString(i) + separator);
+                                    }
+
                                 }
                             }
                             rowData.append("\r\n");
@@ -115,6 +118,11 @@ public class ExtractDataBySQL {
                         System.out.println("Extraction PageData Timeuse: " + (end - begin) + "ms");
                         resultSet.close();
                         preparedStatement.close();
+                        if(startNum==1&&increment==10000000){
+
+                        }else{
+                            flag=false;
+                        }
                     }
 
                     connection.close();

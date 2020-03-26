@@ -3,16 +3,19 @@
 
 <suite name="CCR Extraction Test Suite">
 
-    <test name="CCR Tables Extraction by SQL with Excel file">
+    <test name="CCR Tables Extraction by SQL From DB with Excel file">
         <parameter name="DBTag" value="oracle"/>
         <parameter name="ip_port" value="fnr-scan-ut0234.int.thomsonreuters.com:1521:oru848a1"/>
         <parameter name="username" value="read_only"/>
         <parameter name="password" value="read_only"/>
         <parameter name="excelPath"
-                   value="C:/Users/uc260386/database-compare-preprocessor - AWS/src/data/TieOutSQL2.xlsx"/>
+                   value="C:/Users/uc260386/database-compare-preprocessor - AWS/src/data/CompareSQL1.xlsx"/>
         <parameter name="destPath" value="local"/>
+        <parameter name="startNum" value="1"/>
+        <parameter name="increment" value="1000"/>
+        <parameter name="separator" value="|"/>
         <classes>
-            <class name="com.refinitiv.ejvqa.ExtractDataBySQLTest"/>
+            <class name="com.refinitiv.ejvqa.ExtractDataFromRelationshipTest"/>
         </classes>
     </test>
 

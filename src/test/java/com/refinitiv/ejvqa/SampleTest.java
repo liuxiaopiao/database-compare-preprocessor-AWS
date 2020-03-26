@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.ParseException;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -152,5 +153,13 @@ public class SampleTest {
         String path2="C:\\Data1\\Data\\ciqm.diff";
         String tableName2="ss_ciqm.diff";
         CommonUtil.gzipFile(path2,schema,tableName2);
+    }
+
+    @Test
+    public void date2UTCTest() throws ParseException {
+        String date="2018-11-28 00:32:40.412000";
+        System.out.println(date);
+        String datecon=CommonUtil.date2UTC(date);
+        System.out.println(datecon);
     }
 }
