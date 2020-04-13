@@ -3,7 +3,7 @@
 
 <suite name="CCR Extraction Test Suite">
 
-    <test name="CCR Tables Extraction by SQL From DB with Excel file">
+    <test name="CCR Tables Extraction by SQL From Oracle DB with Excel file">
         <parameter name="DBTag" value="oracle"/>
         <parameter name="ip_port" value="fnr-scan-ut0234.int.thomsonreuters.com:1521:oru848a1"/>
         <parameter name="username" value="read_only"/>
@@ -14,8 +14,10 @@
         <parameter name="startNum" value="1"/>
         <parameter name="increment" value="1000"/>
         <parameter name="separator" value="|"/>
+        <parameter name="isExtractAll" value="false"/>
+        <parameter name="append" value="false"/>
         <classes>
-            <class name="com.refinitiv.ejvqa.ExtractDataFromRelationshipTest"/>
+            <class name="com.refinitiv.ejvqa.ExtractDataFromMultiDBBySQLTest"/>
         </classes>
     </test>
 
