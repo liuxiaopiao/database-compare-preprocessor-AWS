@@ -9,7 +9,7 @@
         <parameter name="username" value="read_only"/>
         <parameter name="password" value="read_only"/>
         <parameter name="excelPath"
-                   value="C:/Users/uc260386/database-compare-preprocessor - AWS/src/data/TieOutSQL2.xlsx"/>
+                   value="C:/Users/uc260386/database-compare-preprocessor - AWS/src/data/CompareSQL1.xlsx"/>
         <parameter name="destPath" value="local"/>
         <classes>
             <class name="com.refinitiv.ejvqa.ExtractDataBySQLTest"/>
