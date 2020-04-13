@@ -48,7 +48,7 @@ public class ExtractDataFromMultiDBBySQL {
                 }else {
                     filePath=destPath + fileName;
                 }
-
+                int beginNum=startNum;
 
                 long start = System.currentTimeMillis();
                 boolean flag = true;
@@ -57,13 +57,13 @@ public class ExtractDataFromMultiDBBySQL {
                     int j = 0;
                     String query=null;
                     if("oracle".equalsIgnoreCase(DBTag)) {
-                       query = "select * from (select a.*,rownum rn from (" + sql + ") a where rownum<" + (startNum + increment) + ") where rn>=" + startNum;
+                       query = "select * from (select a.*,rownum rn from (" + sql + ") a where rownum<" + (beginNum + increment) + ") where rn>=" + beginNum;
                     }else if("mysql".equalsIgnoreCase(DBTag)){
-                        query=sql+" limit "+startNum+","+(startNum + increment);
+                        query=sql+" limit "+beginNum+","+(beginNum + increment);
                     }else if("mssql".equalsIgnoreCase(DBTag)){
-                        query="select top "+increment+" * from (select *,row_number() over(order by 1 asc) as rownumber from ("+sql+")) a where rownumber>"+startNum;
+                        query="select top "+increment+" * from (select *,row_number() over(order by 1 asc) as rownumber from ("+sql+")) a where rownumber>"+beginNum;
                     }else if("sybase".equalsIgnoreCase(DBTag)){
-                        query="select * from ("+sql+") a where a.1 between "+startNum+" and "+(startNum+increment);
+                        query="select * from ("+sql+") a where a.1 between "+beginNum+" and "+(beginNum+increment);
                     }else{
                         System.out.println("The database is not currently supported!");
                     }
@@ -128,7 +128,7 @@ public class ExtractDataFromMultiDBBySQL {
                     resultSet.close();
                     preparedStatement.close();
 
-                    startNum=startNum+increment;
+                    beginNum=beginNum+increment;
                     if (Boolean.valueOf(isExtractAll)) {
 
                     } else {
